@@ -1,0 +1,36 @@
+(function(){
+  "use strict";
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card.topic[data-topic]'));
+  var total = cards.length;
+  var doneCount = 0, progressCount = 0;
+
+  cards.forEach(function(card){
+    var id = card.getAttribute('data-topic');
+    var pill = card.querySelector('.pill');
+    var hasProgress = false, hasBest = false;
+    try{ hasProgress = !!localStorage.getItem('pdr_t'+id+'_progress_v1'); }catch(e){ /* ignore */ }
+    try{ hasBest = !!localStorage.getItem('pdr_t'+id+'_best_v1'); }catch(e){ /* ignore */ }
+
+    if(hasProgress){
+      progressCount++;
+      pill.className = 'pill pill-inprogress';
+      pill.textContent = 'У процесі';
+    } else if(hasBest){
+      doneCount++;
+      pill.className = 'pill pill-done';
+      pill.textContent = 'Завершено';
+    } else {
+      pill.className = 'pill pill-notstarted';
+      pill.textContent = 'Не почато';
+    }
+  });
+
+  var pct = total ? Math.round(doneCount/total*100) : 0;
+  var fill = document.getElementById('overall-fill');
+  var text = document.getElementById('overall-text');
+  if(fill) fill.style.width = pct + '%';
+  if(text){
+    text.textContent = doneCount + '/' + total + ' тем завершено' +
+      (progressCount ? ' · ' + progressCount + ' у процесі' : '');
+  }
+})();

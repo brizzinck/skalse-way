@@ -1,14 +1,7 @@
 <!doctype html>
 <html lang="uk">
 <head>
-<script>
-(function(){
-  try{
-    var t = localStorage.getItem('pdr_theme');
-    if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-  }catch(e){}
-})();
-</script>
+<script src="src/scripts/theme-init.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ПДР — тести за темами</title>
@@ -218,7 +211,7 @@
   </header>
   <div class="grid">
     
-    <a class="card topic" data-topic="01" href="quiz_01_general_provisions.html">
+    <a class="card topic" data-topic="01" href="src/tests/quiz_01_general_provisions.html">
       <div class="topic-num">01</div>
       <div class="topic-body">
         <div class="topic-title">Загальні положення</div>
@@ -230,7 +223,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="02" href="quiz_02_driver_duties_and_rights.html">
+    <a class="card topic" data-topic="02" href="src/tests/quiz_02_driver_duties_and_rights.html">
       <div class="topic-num">02</div>
       <div class="topic-body">
         <div class="topic-title">Обов`язки і права водіїв автотранспортних засобів</div>
@@ -242,7 +235,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="03" href="quiz_03_vehicles_with_special_signals.html">
+    <a class="card topic" data-topic="03" href="src/tests/quiz_03_vehicles_with_special_signals.html">
       <div class="topic-num">03</div>
       <div class="topic-body">
         <div class="topic-title">Рух транспортних засобів із спеціальними сигналами</div>
@@ -254,7 +247,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="04" href="quiz_04_pedestrian_duties_and_rights.html">
+    <a class="card topic" data-topic="04" href="src/tests/quiz_04_pedestrian_duties_and_rights.html">
       <div class="topic-num">04</div>
       <div class="topic-body">
         <div class="topic-title">Обов`язки і права пішоходів</div>
@@ -266,7 +259,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="05" href="quiz_05_passenger_duties_and_rights.html">
+    <a class="card topic" data-topic="05" href="src/tests/quiz_05_passenger_duties_and_rights.html">
       <div class="topic-num">05</div>
       <div class="topic-body">
         <div class="topic-title">Обов`язки і права пасажирів</div>
@@ -278,7 +271,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="06" href="quiz_06_cyclist_requirements.html">
+    <a class="card topic" data-topic="06" href="src/tests/quiz_06_cyclist_requirements.html">
       <div class="topic-num">06</div>
       <div class="topic-body">
         <div class="topic-title">Вимоги до велосипедистів</div>
@@ -290,7 +283,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="07" href="quiz_07_horse_drawn_transport_requirements.html">
+    <a class="card topic" data-topic="07" href="src/tests/quiz_07_horse_drawn_transport_requirements.html">
       <div class="topic-num">07</div>
       <div class="topic-body">
         <div class="topic-title">Вимоги до осіб, які керують гужовим транспортом і погоничів тварин</div>
@@ -302,7 +295,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="08_1" href="quiz_08_1_traffic_light_signals.html">
+    <a class="card topic" data-topic="08_1" href="src/tests/quiz_08_1_traffic_light_signals.html">
       <div class="topic-num">08.1</div>
       <div class="topic-body">
         <div class="topic-title">Регулювання дорожнього руху (регульовані перехрестя)</div>
@@ -314,7 +307,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="08_2" href="quiz_08_2_controller_signals.html">
+    <a class="card topic" data-topic="08_2" href="src/tests/quiz_08_2_controller_signals.html">
       <div class="topic-num">08.2</div>
       <div class="topic-body">
         <div class="topic-title">Регулювання дорожнього руху (нерегульовані перехрестя)</div>
@@ -326,7 +319,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="09" href="quiz_09_warning_signals.html">
+    <a class="card topic" data-topic="09" href="src/tests/quiz_09_warning_signals.html">
       <div class="topic-num">09</div>
       <div class="topic-body">
         <div class="topic-title">Попереджувальні сигнали</div>
@@ -338,7 +331,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="10" href="quiz_10_starting_movement_and_direction_change.html">
+    <a class="card topic" data-topic="10" href="src/tests/quiz_10_starting_movement_and_direction_change.html">
       <div class="topic-num">10</div>
       <div class="topic-body">
         <div class="topic-title">Початок руху та зміна його напрямку</div>
@@ -350,7 +343,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="11" href="quiz_11_vehicle_positioning_on_road.html">
+    <a class="card topic" data-topic="11" href="src/tests/quiz_11_vehicle_positioning_on_road.html">
       <div class="topic-num">11</div>
       <div class="topic-body">
         <div class="topic-title">Розташування транспортних засобів на дорозі</div>
@@ -362,7 +355,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="12" href="quiz_12_speed.html">
+    <a class="card topic" data-topic="12" href="src/tests/quiz_12_speed.html">
       <div class="topic-num">12</div>
       <div class="topic-body">
         <div class="topic-title">Швидкість руху</div>
@@ -374,7 +367,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="13" href="quiz_13_distance_interval_oncoming_traffic.html">
+    <a class="card topic" data-topic="13" href="src/tests/quiz_13_distance_interval_oncoming_traffic.html">
       <div class="topic-num">13</div>
       <div class="topic-body">
         <div class="topic-title">Дистанція, інтервал, зустрічний роз`їзд</div>
@@ -386,7 +379,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="14" href="quiz_14_overtaking.html">
+    <a class="card topic" data-topic="14" href="src/tests/quiz_14_overtaking.html">
       <div class="topic-num">14</div>
       <div class="topic-body">
         <div class="topic-title">Обгін</div>
@@ -398,7 +391,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="15" href="quiz_15_stopping_and_parking.html">
+    <a class="card topic" data-topic="15" href="src/tests/quiz_15_stopping_and_parking.html">
       <div class="topic-num">15</div>
       <div class="topic-body">
         <div class="topic-title">Зупинка і стоянка</div>
@@ -410,7 +403,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="16_1" href="quiz_16_1_intersections_controlled.html">
+    <a class="card topic" data-topic="16_1" href="src/tests/quiz_16_1_intersections_controlled.html">
       <div class="topic-num">16.1</div>
       <div class="topic-body">
         <div class="topic-title">Проїзд перехресть (регульовані перехрестя)</div>
@@ -422,7 +415,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="16_2" href="quiz_16_2_intersections_uncontrolled.html">
+    <a class="card topic" data-topic="16_2" href="src/tests/quiz_16_2_intersections_uncontrolled.html">
       <div class="topic-num">16.2</div>
       <div class="topic-body">
         <div class="topic-title">Проїзд перехресть (нерегульовані перехрестя)</div>
@@ -434,7 +427,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="17" href="quiz_17_priority_of_route_vehicles.html">
+    <a class="card topic" data-topic="17" href="src/tests/quiz_17_priority_of_route_vehicles.html">
       <div class="topic-num">17</div>
       <div class="topic-body">
         <div class="topic-title">Переваги маршрутних транспортних засобів</div>
@@ -446,7 +439,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="18" href="quiz_18_pedestrian_crossings_and_stops.html">
+    <a class="card topic" data-topic="18" href="src/tests/quiz_18_pedestrian_crossings_and_stops.html">
       <div class="topic-num">18</div>
       <div class="topic-body">
         <div class="topic-title">Проїзд пішохідних переходів і зупинок транспортних засобів</div>
@@ -458,7 +451,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="19" href="quiz_19_exterior_lights_usage.html">
+    <a class="card topic" data-topic="19" href="src/tests/quiz_19_exterior_lights_usage.html">
       <div class="topic-num">19</div>
       <div class="topic-body">
         <div class="topic-title">Користування зовнішніми світловими приладами</div>
@@ -470,7 +463,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="20" href="quiz_20_railway_crossings.html">
+    <a class="card topic" data-topic="20" href="src/tests/quiz_20_railway_crossings.html">
       <div class="topic-num">20</div>
       <div class="topic-body">
         <div class="topic-title">Рух через залізничні переїзди</div>
@@ -482,7 +475,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="21" href="quiz_21_passenger_transport.html">
+    <a class="card topic" data-topic="21" href="src/tests/quiz_21_passenger_transport.html">
       <div class="topic-num">21</div>
       <div class="topic-body">
         <div class="topic-title">Перевезення пасажирів</div>
@@ -494,7 +487,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="22" href="quiz_22_cargo_transport.html">
+    <a class="card topic" data-topic="22" href="src/tests/quiz_22_cargo_transport.html">
       <div class="topic-num">22</div>
       <div class="topic-body">
         <div class="topic-title">Перевезення вантажу</div>
@@ -506,7 +499,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="23" href="quiz_23_towing_and_vehicle_trains.html">
+    <a class="card topic" data-topic="23" href="src/tests/quiz_23_towing_and_vehicle_trains.html">
       <div class="topic-num">23</div>
       <div class="topic-body">
         <div class="topic-title">Буксирування та експлуатація транспортних составів</div>
@@ -518,7 +511,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="24" href="quiz_24_learner_driving.html">
+    <a class="card topic" data-topic="24" href="src/tests/quiz_24_learner_driving.html">
       <div class="topic-num">24</div>
       <div class="topic-body">
         <div class="topic-title">Навчальна їзда</div>
@@ -530,7 +523,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="25" href="quiz_25_vehicle_convoys.html">
+    <a class="card topic" data-topic="25" href="src/tests/quiz_25_vehicle_convoys.html">
       <div class="topic-num">25</div>
       <div class="topic-body">
         <div class="topic-title">Рух транспортних засобів у колонах</div>
@@ -542,7 +535,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="26" href="quiz_26_residential_and_pedestrian_zones.html">
+    <a class="card topic" data-topic="26" href="src/tests/quiz_26_residential_and_pedestrian_zones.html">
       <div class="topic-num">26</div>
       <div class="topic-body">
         <div class="topic-title">Рух у житловій та пішохідній зоні</div>
@@ -554,7 +547,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="27" href="quiz_27_motorways.html">
+    <a class="card topic" data-topic="27" href="src/tests/quiz_27_motorways.html">
       <div class="topic-num">27</div>
       <div class="topic-body">
         <div class="topic-title">Рух по автомагістралях і дорогах для автомобілів</div>
@@ -566,7 +559,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="28" href="quiz_28_mountain_roads.html">
+    <a class="card topic" data-topic="28" href="src/tests/quiz_28_mountain_roads.html">
       <div class="topic-num">28</div>
       <div class="topic-body">
         <div class="topic-title">Рух по гірських дорогах і на крутих спусках</div>
@@ -578,7 +571,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="29" href="quiz_29_international_traffic.html">
+    <a class="card topic" data-topic="29" href="src/tests/quiz_29_international_traffic.html">
       <div class="topic-num">29</div>
       <div class="topic-body">
         <div class="topic-title">Міжнародний рух</div>
@@ -590,7 +583,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="30" href="quiz_30_plates_and_identification_marks.html">
+    <a class="card topic" data-topic="30" href="src/tests/quiz_30_plates_and_identification_marks.html">
       <div class="topic-num">30</div>
       <div class="topic-body">
         <div class="topic-title">Номерні, розпізнавальні знаки, написи і позначення</div>
@@ -602,7 +595,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="31" href="quiz_31_vehicle_technical_condition.html">
+    <a class="card topic" data-topic="31" href="src/tests/quiz_31_vehicle_technical_condition.html">
       <div class="topic-num">31</div>
       <div class="topic-body">
         <div class="topic-title">Технічний стан транспортних засобів та їх обладнання</div>
@@ -614,7 +607,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="32" href="quiz_32_special_traffic_matters.html">
+    <a class="card topic" data-topic="32" href="src/tests/quiz_32_special_traffic_matters.html">
       <div class="topic-num">32</div>
       <div class="topic-body">
         <div class="topic-title">Окремі питання дорожнього руху, що потребують узгодження</div>
@@ -626,7 +619,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="33" href="quiz_33_all_road_signs.html">
+    <a class="card topic" data-topic="33" href="src/tests/quiz_33_all_road_signs.html">
       <div class="topic-num">33</div>
       <div class="topic-body">
         <div class="topic-title">Дорожні знаки (усі категорії)</div>
@@ -638,7 +631,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="34" href="quiz_34_road_markings.html">
+    <a class="card topic" data-topic="34" href="src/tests/quiz_34_road_markings.html">
       <div class="topic-num">34</div>
       <div class="topic-body">
         <div class="topic-title">Дорожня розмітка</div>
@@ -650,7 +643,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="35" href="quiz_35_safe_driving_fundamentals.html">
+    <a class="card topic" data-topic="35" href="src/tests/quiz_35_safe_driving_fundamentals.html">
       <div class="topic-num">35</div>
       <div class="topic-body">
         <div class="topic-title">Основи безпечного водіння</div>
@@ -662,7 +655,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="36" href="quiz_36_traffic_law_basics.html">
+    <a class="card topic" data-topic="36" href="src/tests/quiz_36_traffic_law_basics.html">
       <div class="topic-num">36</div>
       <div class="topic-body">
         <div class="topic-title">Основи права в області дорожнього руху</div>
@@ -674,7 +667,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="37" href="quiz_37_first_aid.html">
+    <a class="card topic" data-topic="37" href="src/tests/quiz_37_first_aid.html">
       <div class="topic-num">37</div>
       <div class="topic-body">
         <div class="topic-title">Надання першої медичної допомоги</div>
@@ -686,7 +679,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="38" href="quiz_38_driving_ethics.html">
+    <a class="card topic" data-topic="38" href="src/tests/quiz_38_driving_ethics.html">
       <div class="topic-num">38</div>
       <div class="topic-body">
         <div class="topic-title">Етика водіння, культура та відпочинок водія</div>
@@ -698,7 +691,7 @@
       <div class="chev">→</div>
     </a>
 
-    <a class="card topic" data-topic="39" href="quiz_39_europrotocol.html">
+    <a class="card topic" data-topic="39" href="src/tests/quiz_39_europrotocol.html">
       <div class="topic-num">39</div>
       <div class="topic-body">
         <div class="topic-title">Європротокол</div>
@@ -712,67 +705,7 @@
   </div>
   <footer>Джерело питань і відповідей: pdr-online.com.ua · зроблено для власної підготовки до іспиту</footer>
 </div>
-<script>
-(function(){
-  "use strict";
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.card.topic[data-topic]'));
-  var total = cards.length;
-  var doneCount = 0, progressCount = 0;
-
-  cards.forEach(function(card){
-    var id = card.getAttribute('data-topic');
-    var pill = card.querySelector('.pill');
-    var hasProgress = false, hasBest = false;
-    try{ hasProgress = !!localStorage.getItem('pdr_t'+id+'_progress_v1'); }catch(e){ /* ignore */ }
-    try{ hasBest = !!localStorage.getItem('pdr_t'+id+'_best_v1'); }catch(e){ /* ignore */ }
-
-    if(hasProgress){
-      progressCount++;
-      pill.className = 'pill pill-inprogress';
-      pill.textContent = 'У процесі';
-    } else if(hasBest){
-      doneCount++;
-      pill.className = 'pill pill-done';
-      pill.textContent = 'Завершено';
-    } else {
-      pill.className = 'pill pill-notstarted';
-      pill.textContent = 'Не почато';
-    }
-  });
-
-  var pct = total ? Math.round(doneCount/total*100) : 0;
-  var fill = document.getElementById('overall-fill');
-  var text = document.getElementById('overall-text');
-  if(fill) fill.style.width = pct + '%';
-  if(text){
-    text.textContent = doneCount + '/' + total + ' тем завершено' +
-      (progressCount ? ' · ' + progressCount + ' у процесі' : '');
-  }
-})();
-</script>
-<script>
-(function(){
-  var THEME_KEY = 'pdr_theme';
-  var btn = document.getElementById('theme-toggle');
-  if(!btn) return;
-  function currentTheme(){
-    var stored = null;
-    try{ stored = localStorage.getItem(THEME_KEY); }catch(e){}
-    if(stored === 'light' || stored === 'dark') return stored;
-    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-  }
-  function applyIcon(theme){
-    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-    btn.setAttribute('aria-label', theme === 'dark' ? 'Світла тема' : 'Темна тема');
-  }
-  applyIcon(currentTheme());
-  btn.addEventListener('click', function(){
-    var next = currentTheme() === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
-    applyIcon(next);
-  });
-})();
-</script>
+<script src="src/scripts/index-status.js"></script>
+<script src="src/scripts/theme-toggle.js"></script>
 </body>
 </html>
