@@ -226,7 +226,7 @@
     els.quizScore.textContent = computeScore() + ' ✓';
     els.quizExplain.classList.add('show');
     els.btnNext.disabled = false;
-    els.btnNext.focus();
+    els.btnNext.focus({preventScroll: true});
     saveProgress();
   }
 
