@@ -570,6 +570,59 @@ footer.foot a{color:var(--ink-soft);}
 
 [hidden]{display:none !important;}
 
+/* ---------- desktop: use the extra width instead of leaving it empty ---------- */
+@media (min-width:900px){
+  .shell{max-width:1180px; padding:46px 34px 90px; gap:30px;}
+  .brand .title{font-size:28px;}
+  .navtabs button{font-size:18px; padding:14px 22px;}
+  .backlink{font-size:18px;}
+  .roadwrap{gap:16px;}
+  .roadbar{height:16px;}
+  .roadstat, .scoreping{font-size:19px;}
+  .card{padding:42px;}
+  .hero{gap:28px; padding:58px 46px;}
+  .hero .sign{font-size:18px; padding:8px 18px 8px 15px;}
+  .hero h1{font-size:clamp(38px, 5vw, 60px);}
+  .hero p.lede{font-size:25px;}
+  .hero .facts{gap:16px 32px;}
+  .hero .fact b{font-size:33px;}
+  .hero .fact span{font-size:18px;}
+  .startrow{gap:19px;}
+  label.shuffle{font-size:21px; gap:12px;}
+  .best{font-size:20px;}
+  .btn{font-size:22px; padding:19px 38px; min-height:68px;}
+  .btn-sm{padding:15px 27px; font-size:19px; min-height:58px;}
+  .qnum{font-size:19px;}
+  .qtext{font-size:clamp(27px, 2.6vw, 32px);}
+  .qimg{margin:6px 0 24px;}
+  .limg{max-width:580px;}
+  .imgnote{font-size:18px; padding:7px 16px;}
+  .options{gap:16px; margin-top:28px;}
+  .opt{gap:19px; padding:22px 25px; font-size:24px;}
+  .opt .badge{width:42px; height:42px; font-size:19px;}
+  .opt .mark{font-size:25px;}
+  .explain{margin-top:28px; padding:25px 28px; font-size:21px; border-left-width:5px;}
+  .explain b{font-size:18px;}
+  .quizfoot{gap:14px; margin-top:36px;}
+  .summary{padding:64px 42px;}
+  .summary .big{font-size:clamp(60px, 6vw, 84px);}
+  .summary .pct{font-size:23px;}
+  .summary .verdict{font-size:22px; margin:28px auto 0;}
+  .missedwrap{margin-top:38px;}
+  .chiprow{gap:12px;}
+  .chip{font-size:19px; padding:12px 19px; min-height:54px;}
+  .summaryactions{gap:16px; margin-top:44px;}
+  .listmeta p{font-size:21px;}
+  .litem > button.lq{padding:25px 25px; gap:19px;}
+  .litem .lnum{font-size:19px; min-width:38px;}
+  .litem .lqtext{font-size:23px;}
+  .litem .lopts{gap:8px;}
+  .litem .lopt{font-size:21px;}
+  .litem .lexplain{padding:0 25px 28px 84px; font-size:21px;}
+  footer.foot{font-size:19px;}
+  .theme-toggle{width:50px; height:50px; font-size:22px;}
+}
+
 @media (max-width:640px){
   .shell{padding:22px 16px 48px; gap:18px;}
   header.topbar{padding-bottom:17px;}
