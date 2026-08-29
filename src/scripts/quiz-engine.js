@@ -241,12 +241,32 @@
     }
   });
 
-  els.btnBack.addEventListener('click', function(){
+  function goBack(){
     if(qi === 0) return;
     qi--;
     renderQuestion();
     saveProgress();
-  });
+  }
+  els.btnBack.addEventListener('click', goBack);
+
+  /* swipe left on the quiz screen (phones) goes back one question */
+  var swipeStartX = 0, swipeStartY = 0, swipeTracking = false;
+  els.viewQuiz.addEventListener('touchstart', function(e){
+    if(e.touches.length !== 1) return;
+    swipeStartX = e.touches[0].clientX;
+    swipeStartY = e.touches[0].clientY;
+    swipeTracking = true;
+  }, {passive: true});
+  els.viewQuiz.addEventListener('touchend', function(e){
+    if(!swipeTracking) return;
+    swipeTracking = false;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - swipeStartX;
+    var dy = t.clientY - swipeStartY;
+    if(dx < -60 && Math.abs(dx) > Math.abs(dy) * 1.5){
+      goBack();
+    }
+  }, {passive: true});
 
   els.btnQuit.addEventListener('click', function(){
     if(confirm('Завершити тест достроково? Прогрес до цього моменту буде враховано.')){
