@@ -19,15 +19,18 @@ There is no package.json, build step, linter, or test suite — these are plain 
   - `theme-toggle.js` — wires the light/dark toggle button, used by every page
   - `quiz-engine.js` — the actual quiz engine, shared by all 41 quiz pages (see below)
   - `index-status.js` — computes each topic card's status pill + the overall progress bar on `index.html`
+- `src/styles/quiz.css` — shared stylesheet for all 41 quiz pages, linked via `<link rel="stylesheet" href="../styles/quiz.css">`. `index.html` keeps its own separate inline `<style>` block (not shared with the quiz pages).
 - `photos/` — source images, not a runtime asset (see below)
 
-### Quiz pages: shared engine, per-page data
-Each `src/tests/quiz_*.html` inlines only what's genuinely per-page: CSS in a `<style>` block and the question bank as a JSON blob in `<script type="application/json" id="quiz-data">`. The quiz engine logic itself is **not** duplicated — every quiz page loads the same `../scripts/quiz-engine.js`. A page identifies itself to the shared engine with a one-line inline script right before that include:
+### Quiz pages: shared engine + styles, per-page data
+Each `src/tests/quiz_*.html` inlines only what's genuinely per-page: the question bank as a JSON blob in `<script type="application/json" id="quiz-data">`. Neither the CSS nor the quiz engine logic is duplicated — every quiz page links the same `../styles/quiz.css` and loads the same `../scripts/quiz-engine.js`. A page identifies itself to the shared engine with a one-line inline script right before that include:
 ```html
 <script>window.PDR_TOPIC_ID = '01';</script>
 <script src="../scripts/quiz-engine.js"></script>
 ```
-`PDR_TOPIC_ID` must match the file's own topic id (e.g. `08_1` for `quiz_08_1_traffic_light_signals.html`) — the engine builds its localStorage keys from it (`pdr_t<PDR_TOPIC_ID>_best_v1`, `pdr_t<PDR_TOPIC_ID>_progress_v1`). Because the engine is shared, a bug fix or restyle to the quiz flow only needs to happen once in `quiz-engine.js`, not across 41 files — this replaced an earlier fully-duplicated-per-file setup where a hardcoded `LS_KEY` had caused all topics to clobber the same best-score entry.
+`PDR_TOPIC_ID` must match the file's own topic id (e.g. `08_1` for `quiz_08_1_traffic_light_signals.html`) — the engine builds its localStorage keys from it (`pdr_t<PDR_TOPIC_ID>_best_v1`, `pdr_t<PDR_TOPIC_ID>_progress_v1`). Because the engine (and CSS) is shared, a bug fix or restyle to the quiz flow only needs to happen once in `quiz-engine.js`/`quiz.css`, not across 41 files — this replaced an earlier fully-duplicated-per-file setup where a hardcoded `LS_KEY` had caused all topics to clobber the same best-score entry.
+
+`quiz.css` deliberately uses a large type/spacing scale (question text, options, images, buttons all sized up) so the quiz is fully readable on both desktop and phone without pinch-zooming; when adjusting it, check both a ~1440px desktop width and a ~390px phone width for horizontal overflow or clipped content before treating a change as done.
 
 ### Question data shape
 Each entry in the `quiz-data` JSON array looks like:
