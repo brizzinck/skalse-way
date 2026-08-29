@@ -227,6 +227,10 @@
     els.quizExplain.classList.add('show');
     els.btnNext.disabled = false;
     els.btnNext.focus({preventScroll: true});
+    els.quizExplain.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
     saveProgress();
   }
 

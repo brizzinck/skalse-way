@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A static, no-build set of HTML quiz pages for studying the Ukrainian PDR (traffic rules) theory exam. `index.html` (repo root) is a topic picker linking to 41 `src/tests/quiz_NN_<slug>.html` files (39 official PDR test topics; topics 08 and 16 are each split into `_1`/`_2` variants, hence 41 files). All page content and copy is in Ukrainian; question/answer/explanation text is sourced from pdr-online.com.ua.
+A static, no-build set of HTML quiz pages for studying the Ukrainian PDR (traffic rules) theory exam, authored as skalse-way. `index.html` (repo root) is a topic picker linking to 41 `src/tests/quiz_NN_<slug>.html` files (39 official PDR test topics; topics 08 and 16 are each split into `_1`/`_2` variants, hence 41 files). All page content and copy is in Ukrainian.
 
 There is no package.json, build step, linter, or test suite — these are plain HTML files with `<script src>` references to plain `.js` files, no bundler.
 
