@@ -267,6 +267,7 @@
       goBack();
     }
   }, {passive: true});
+  els.viewQuiz.addEventListener('touchcancel', function(){ swipeTracking = false; }, {passive: true});
 
   els.btnQuit.addEventListener('click', function(){
     if(confirm('Завершити тест достроково? Прогрес до цього моменту буде враховано.')){

@@ -570,6 +570,8 @@ footer.foot a{color:var(--ink-soft);}
 
 [hidden]{display:none !important;}
 
+#view-quiz{touch-action:pan-y;}
+
 /* ---------- desktop: use the extra width instead of leaving it empty ---------- */
 @media (min-width:900px){
   .shell{max-width:1180px; padding:46px 34px 90px; gap:30px;}
