@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ПДР — тести за темами</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+  :root{
+    --ink:#1c1d22;
+    --ink-soft:#5a5c66;
+    --ink-faint:#8b8d97;
+    --paper:#f3efe4;
+    --surface:#fdfbf5;
+    --surface-raised:#ffffff;
+    --line:rgba(28,29,34,0.14);
+    --line-strong:rgba(28,29,34,0.26);
+    --accent:#d9922c;
+    --accent-ink:#3a2a0c;
+    --accent-soft:rgba(217,146,44,0.14);
+    --good:#2f7d51;
+    --good-soft:rgba(47,125,81,0.13);
+    --good-line:rgba(47,125,81,0.4);
+    --bad:#b8422f;
+    --bad-soft:rgba(184,66,47,0.12);
+    --bad-line:rgba(184,66,47,0.42);
+    --shadow:0 1px 2px rgba(28,29,34,0.06), 0 8px 24px -12px rgba(28,29,34,0.22);
+    --radius-lg:20px;
+    --radius-md:12px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#eeece3;
+      --ink-soft:#b4b3ac;
+      --ink-faint:#84838a;
+      --paper:#17181c;
+      --surface:#1e1f24;
+      --surface-raised:#25262c;
+      --line:rgba(238,236,227,0.12);
+      --line-strong:rgba(238,236,227,0.22);
+      --accent:#e8ab52;
+      --accent-ink:#1c1300;
+      --accent-soft:rgba(232,171,82,0.16);
+      --good:#4fb37c;
+      --good-soft:rgba(79,179,124,0.16);
+      --good-line:rgba(79,179,124,0.42);
+      --bad:#e1725e;
+      --bad-soft:rgba(225,114,94,0.16);
+      --bad-line:rgba(225,114,94,0.42);
+      --shadow:0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'PT Sans','Segoe UI',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .eyebrow{
+    font-family:'Oswald','Arial Narrow',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-faint);
+  }
+  .shell{max-width:840px;margin:0 auto;padding:32px 20px 80px;}
+  header{margin-bottom:22px;}
+  header h1{
+    font-family:'Oswald','Arial Narrow',sans-serif;
+    font-size:34px;
+    font-weight:700;
+    margin:4px 0 10px;
+    text-wrap:balance;
+  }
+  header p{margin:0; color:var(--ink-soft); font-size:15px; max-width:60ch; line-height:1.5;}
+  .progresswrap{
+    display:flex; align-items:center; gap:12px; margin-top:18px;
+  }
+  .roadbar{
+    position:relative; flex:1; height:10px; border-radius:999px; background:var(--line); overflow:hidden;
+  }
+  .roadbar .fill{
+    position:absolute; inset:0 auto 0 0; width:100%;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 10px, rgba(255,255,255,0.55) 10px 14px, transparent 14px 24px),
+      linear-gradient(90deg, var(--accent), var(--accent));
+    border-radius:999px;
+  }
+  .progresstext{
+    font-family:'Oswald','Arial Narrow',sans-serif;
+    font-size:13px; font-weight:600; color:var(--ink-soft); white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .grid{display:flex; flex-direction:column; gap:10px; margin-top:26px;}
+  .card.topic{
+    display:flex; align-items:center; gap:16px;
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    padding:14px 18px;
+    text-decoration:none;
+    color:inherit;
+    box-shadow:var(--shadow);
+    transition:border-color .15s ease, transform .1s ease;
+  }
+  a.card.topic:hover{border-color:var(--line-strong); transform:translateY(-1px);}
+  a.card.topic:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .card.topic.pending, .card.topic.special{opacity:.6;}
+  .topic-num{
+    flex:0 0 auto;
+    width:44px; height:44px;
+    border-radius:10px;
+    background:var(--accent-soft);
+    color:var(--accent-ink);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald','Arial Narrow',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    font-variant-numeric:tabular-nums;
+  }
+  .card.topic.pending .topic-num, .card.topic.special .topic-num{
+    background:var(--line); color:var(--ink-faint);
+  }
+  .topic-body{flex:1; min-width:0;}
+  .topic-title{font-size:15.5px; font-weight:700; line-height:1.3;}
+  .topic-meta{display:flex; align-items:center; gap:10px; margin-top:4px;}
+  .qcount{font-size:12.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums;}
+  .pill{
+    font-family:'Oswald','Arial Narrow',sans-serif;
+    font-size:11px; font-weight:600; letter-spacing:.03em; text-transform:uppercase;
+    padding:3px 9px; border-radius:999px;
+  }
+  .pill-done{background:var(--good-soft); color:var(--good); border:1px solid var(--good-line);}
+  .pill-pending{background:var(--line); color:var(--ink-faint);}
+  .pill-special{background:var(--accent-soft); color:var(--accent-ink); border:1px solid rgba(217,146,44,.4);}
+  .chev{flex:0 0 auto; color:var(--ink-faint); font-size:18px;}
+  .card.topic.pending .chev, .card.topic.special .chev{visibility:hidden;}
+  footer{text-align:center; font-size:12.5px; color:var(--ink-faint); padding-top:30px;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <span class="eyebrow">ПДР · Тести за темами</span>
+    <h1>Обери тему</h1>
+    <p>Кожна тема — окремий інтерактивний тренажер з офіційним ключем відповідей і поясненнями, знятими напряму з pdr-online.com.ua. Разом 1697 питань по 41 темах.</p>
+    <div class="progresswrap">
+      <div class="roadbar"><div class="fill"></div></div>
+      <span class="progresstext">41/41 тем · 1697/1697 питань</span>
+    </div>
+  </header>
+  <div class="grid">
+    
+    <a class="card topic done" href="quiz_01_general_provisions.html">
+      <div class="topic-num">01</div>
+      <div class="topic-body">
+        <div class="topic-title">Загальні положення</div>
+        <div class="topic-meta">
+          <span class="qcount">79 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_02_driver_duties_and_rights.html">
+      <div class="topic-num">02</div>
+      <div class="topic-body">
+        <div class="topic-title">Обов`язки і права водіїв автотранспортних засобів</div>
+        <div class="topic-meta">
+          <span class="qcount">37 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_03_vehicles_with_special_signals.html">
+      <div class="topic-num">03</div>
+      <div class="topic-body">
+        <div class="topic-title">Рух транспортних засобів із спеціальними сигналами</div>
+        <div class="topic-meta">
+          <span class="qcount">16 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_04_pedestrian_duties_and_rights.html">
+      <div class="topic-num">04</div>
+      <div class="topic-body">
+        <div class="topic-title">Обов`язки і права пішоходів</div>
+        <div class="topic-meta">
+          <span class="qcount">26 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_05_passenger_duties_and_rights.html">
+      <div class="topic-num">05</div>
+      <div class="topic-body">
+        <div class="topic-title">Обов`язки і права пасажирів</div>
+        <div class="topic-meta">
+          <span class="qcount">16 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_06_cyclist_requirements.html">
+      <div class="topic-num">06</div>
+      <div class="topic-body">
+        <div class="topic-title">Вимоги до велосипедистів</div>
+        <div class="topic-meta">
+          <span class="qcount">22 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_07_horse_drawn_transport_requirements.html">
+      <div class="topic-num">07</div>
+      <div class="topic-body">
+        <div class="topic-title">Вимоги до осіб, які керують гужовим транспортом і погоничів тварин</div>
+        <div class="topic-meta">
+          <span class="qcount">8 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_08_1_traffic_light_signals.html">
+      <div class="topic-num">08.1</div>
+      <div class="topic-body">
+        <div class="topic-title">Регулювання дорожнього руху (регульовані перехрестя)</div>
+        <div class="topic-meta">
+          <span class="qcount">84 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_08_2_controller_signals.html">
+      <div class="topic-num">08.2</div>
+      <div class="topic-body">
+        <div class="topic-title">Регулювання дорожнього руху (нерегульовані перехрестя)</div>
+        <div class="topic-meta">
+          <span class="qcount">7 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_09_warning_signals.html">
+      <div class="topic-num">09</div>
+      <div class="topic-body">
+        <div class="topic-title">Попереджувальні сигнали</div>
+        <div class="topic-meta">
+          <span class="qcount">60 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_10_starting_movement_and_direction_change.html">
+      <div class="topic-num">10</div>
+      <div class="topic-body">
+        <div class="topic-title">Початок руху та зміна його напрямку</div>
+        <div class="topic-meta">
+          <span class="qcount">76 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_11_vehicle_positioning_on_road.html">
+      <div class="topic-num">11</div>
+      <div class="topic-body">
+        <div class="topic-title">Розташування транспортних засобів на дорозі</div>
+        <div class="topic-meta">
+          <span class="qcount">39 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_12_speed.html">
+      <div class="topic-num">12</div>
+      <div class="topic-body">
+        <div class="topic-title">Швидкість руху</div>
+        <div class="topic-meta">
+          <span class="qcount">41 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_13_distance_interval_oncoming_traffic.html">
+      <div class="topic-num">13</div>
+      <div class="topic-body">
+        <div class="topic-title">Дистанція, інтервал, зустрічний роз`їзд</div>
+        <div class="topic-meta">
+          <span class="qcount">13 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_14_overtaking.html">
+      <div class="topic-num">14</div>
+      <div class="topic-body">
+        <div class="topic-title">Обгін</div>
+        <div class="topic-meta">
+          <span class="qcount">56 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_15_stopping_and_parking.html">
+      <div class="topic-num">15</div>
+      <div class="topic-body">
+        <div class="topic-title">Зупинка і стоянка</div>
+        <div class="topic-meta">
+          <span class="qcount">97 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_16_1_intersections_controlled.html">
+      <div class="topic-num">16.1</div>
+      <div class="topic-body">
+        <div class="topic-title">Проїзд перехресть (регульовані перехрестя)</div>
+        <div class="topic-meta">
+          <span class="qcount">34 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_16_2_intersections_uncontrolled.html">
+      <div class="topic-num">16.2</div>
+      <div class="topic-body">
+        <div class="topic-title">Проїзд перехресть (нерегульовані перехрестя)</div>
+        <div class="topic-meta">
+          <span class="qcount">109 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_17_priority_of_route_vehicles.html">
+      <div class="topic-num">17</div>
+      <div class="topic-body">
+        <div class="topic-title">Переваги маршрутних транспортних засобів</div>
+        <div class="topic-meta">
+          <span class="qcount">11 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_18_pedestrian_crossings_and_stops.html">
+      <div class="topic-num">18</div>
+      <div class="topic-body">
+        <div class="topic-title">Проїзд пішохідних переходів і зупинок транспортних засобів</div>
+        <div class="topic-meta">
+          <span class="qcount">19 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_19_exterior_lights_usage.html">
+      <div class="topic-num">19</div>
+      <div class="topic-body">
+        <div class="topic-title">Користування зовнішніми світловими приладами</div>
+        <div class="topic-meta">
+          <span class="qcount">33 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_20_railway_crossings.html">
+      <div class="topic-num">20</div>
+      <div class="topic-body">
+        <div class="topic-title">Рух через залізничні переїзди</div>
+        <div class="topic-meta">
+          <span class="qcount">31 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_21_passenger_transport.html">
+      <div class="topic-num">21</div>
+      <div class="topic-body">
+        <div class="topic-title">Перевезення пасажирів</div>
+        <div class="topic-meta">
+          <span class="qcount">12 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_22_cargo_transport.html">
+      <div class="topic-num">22</div>
+      <div class="topic-body">
+        <div class="topic-title">Перевезення вантажу</div>
+        <div class="topic-meta">
+          <span class="qcount">6 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_23_towing_and_vehicle_trains.html">
+      <div class="topic-num">23</div>
+      <div class="topic-body">
+        <div class="topic-title">Буксирування та експлуатація транспортних составів</div>
+        <div class="topic-meta">
+          <span class="qcount">20 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_24_learner_driving.html">
+      <div class="topic-num">24</div>
+      <div class="topic-body">
+        <div class="topic-title">Навчальна їзда</div>
+        <div class="topic-meta">
+          <span class="qcount">14 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_25_vehicle_convoys.html">
+      <div class="topic-num">25</div>
+      <div class="topic-body">
+        <div class="topic-title">Рух транспортних засобів у колонах</div>
+        <div class="topic-meta">
+          <span class="qcount">8 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_26_residential_and_pedestrian_zones.html">
+      <div class="topic-num">26</div>
+      <div class="topic-body">
+        <div class="topic-title">Рух у житловій та пішохідній зоні</div>
+        <div class="topic-meta">
+          <span class="qcount">13 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_27_motorways.html">
+      <div class="topic-num">27</div>
+      <div class="topic-body">
+        <div class="topic-title">Рух по автомагістралях і дорогах для автомобілів</div>
+        <div class="topic-meta">
+          <span class="qcount">13 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_28_mountain_roads.html">
+      <div class="topic-num">28</div>
+      <div class="topic-body">
+        <div class="topic-title">Рух по гірських дорогах і на крутих спусках</div>
+        <div class="topic-meta">
+          <span class="qcount">8 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_29_international_traffic.html">
+      <div class="topic-num">29</div>
+      <div class="topic-body">
+        <div class="topic-title">Міжнародний рух</div>
+        <div class="topic-meta">
+          <span class="qcount">1 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_30_plates_and_identification_marks.html">
+      <div class="topic-num">30</div>
+      <div class="topic-body">
+        <div class="topic-title">Номерні, розпізнавальні знаки, написи і позначення</div>
+        <div class="topic-meta">
+          <span class="qcount">14 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_31_vehicle_technical_condition.html">
+      <div class="topic-num">31</div>
+      <div class="topic-body">
+        <div class="topic-title">Технічний стан транспортних засобів та їх обладнання</div>
+        <div class="topic-meta">
+          <span class="qcount">18 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_32_special_traffic_matters.html">
+      <div class="topic-num">32</div>
+      <div class="topic-body">
+        <div class="topic-title">Окремі питання дорожнього руху, що потребують узгодження</div>
+        <div class="topic-meta">
+          <span class="qcount">5 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_33_all_road_signs.html">
+      <div class="topic-num">33</div>
+      <div class="topic-body">
+        <div class="topic-title">Дорожні знаки (усі категорії)</div>
+        <div class="topic-meta">
+          <span class="qcount">357 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_34_road_markings.html">
+      <div class="topic-num">34</div>
+      <div class="topic-body">
+        <div class="topic-title">Дорожня розмітка</div>
+        <div class="topic-meta">
+          <span class="qcount">35 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_35_safe_driving_fundamentals.html">
+      <div class="topic-num">35</div>
+      <div class="topic-body">
+        <div class="topic-title">Основи безпечного водіння</div>
+        <div class="topic-meta">
+          <span class="qcount">171 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_36_traffic_law_basics.html">
+      <div class="topic-num">36</div>
+      <div class="topic-body">
+        <div class="topic-title">Основи права в області дорожнього руху</div>
+        <div class="topic-meta">
+          <span class="qcount">8 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_37_first_aid.html">
+      <div class="topic-num">37</div>
+      <div class="topic-body">
+        <div class="topic-title">Надання першої медичної допомоги</div>
+        <div class="topic-meta">
+          <span class="qcount">60 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_38_driving_ethics.html">
+      <div class="topic-num">38</div>
+      <div class="topic-body">
+        <div class="topic-title">Етика водіння, культура та відпочинок водія</div>
+        <div class="topic-meta">
+          <span class="qcount">14 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+
+    <a class="card topic done" href="quiz_39_europrotocol.html">
+      <div class="topic-num">39</div>
+      <div class="topic-body">
+        <div class="topic-title">Європротокол</div>
+        <div class="topic-meta">
+          <span class="qcount">6 питань</span>
+          <span class="pill pill-done">Готово</span>
+        </div>
+      </div>
+      <div class="chev">→</div>
+    </a>
+  </div>
+  <footer>Джерело питань і відповідей: pdr-online.com.ua · зроблено для власної підготовки до іспиту</footer>
+</div>
+</body>
+</html>
