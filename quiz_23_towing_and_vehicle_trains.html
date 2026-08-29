@@ -1,3 +1,11 @@
+<script>
+(function(){
+  try{
+    var t = localStorage.getItem('pdr_theme');
+    if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  }catch(e){}
+})();
+</script>
 <title>Буксирування та експлуатація транспортних составів — тема 23 ПДР</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,11 +24,11 @@
     --accent-ink:#3a2a0c;
     --accent-soft:rgba(217,146,44,0.14);
     --good:#2f7d51;
-    --good-ink:#0f2e1c;
+    --good-ink:#ffffff;
     --good-soft:rgba(47,125,81,0.13);
     --good-line:rgba(47,125,81,0.4);
     --bad:#b8422f;
-    --bad-ink:#3a130a;
+    --bad-ink:#ffffff;
     --bad-soft:rgba(184,66,47,0.12);
     --bad-line:rgba(184,66,47,0.42);
     --shadow:0 1px 2px rgba(28,29,34,0.06), 0 8px 24px -12px rgba(28,29,34,0.22);
@@ -32,21 +40,21 @@
     :root:not([data-theme="light"]){
       --ink:#eeece3;
       --ink-soft:#b4b3ac;
-      --ink-faint:#84838a;
+      --ink-faint:#949299;
       --paper:#17181c;
       --surface:#1e1f24;
       --surface-raised:#25262c;
       --line:rgba(238,236,227,0.12);
       --line-strong:rgba(238,236,227,0.22);
       --accent:#e8ab52;
-      --accent-ink:#1c1300;
+      --accent-ink:#ffe9c2;
       --accent-soft:rgba(232,171,82,0.16);
       --good:#4fb37c;
-      --good-ink:#eafff2;
+      --good-ink:#17181c;
       --good-soft:rgba(79,179,124,0.16);
       --good-line:rgba(79,179,124,0.42);
       --bad:#e1725e;
-      --bad-ink:#ffefe9;
+      --bad-ink:#17181c;
       --bad-soft:rgba(225,114,94,0.16);
       --bad-line:rgba(225,114,94,0.42);
       --shadow:0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
@@ -55,21 +63,21 @@
   :root[data-theme="dark"]{
     --ink:#eeece3;
     --ink-soft:#b4b3ac;
-    --ink-faint:#84838a;
+    --ink-faint:#949299;
     --paper:#17181c;
     --surface:#1e1f24;
     --surface-raised:#25262c;
     --line:rgba(238,236,227,0.12);
     --line-strong:rgba(238,236,227,0.22);
     --accent:#e8ab52;
-    --accent-ink:#1c1300;
+    --accent-ink:#ffe9c2;
     --accent-soft:rgba(232,171,82,0.16);
     --good:#4fb37c;
-    --good-ink:#eafff2;
+    --good-ink:#17181c;
     --good-soft:rgba(79,179,124,0.16);
     --good-line:rgba(79,179,124,0.42);
     --bad:#e1725e;
-    --bad-ink:#ffefe9;
+    --bad-ink:#17181c;
     --bad-soft:rgba(225,114,94,0.16);
     --bad-line:rgba(225,114,94,0.42);
     --shadow:0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
@@ -77,19 +85,22 @@
 
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
   body{
     background:var(--paper);
     color:var(--ink);
     font-family:'PT Sans', 'Segoe UI', Arial, sans-serif;
     -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
   }
   ::selection{background:var(--accent-soft);}
+  button{touch-action:manipulation;}
 
   .eyebrow{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
     text-transform:uppercase;
     letter-spacing:0.12em;
-    font-size:12px;
+    font-size:12.5px;
     font-weight:600;
     color:var(--ink-faint);
   }
@@ -97,10 +108,10 @@
   .shell{
     max-width:760px;
     margin:0 auto;
-    padding:28px 20px 80px;
+    padding:32px 24px 90px;
     display:flex;
     flex-direction:column;
-    gap:20px;
+    gap:22px;
   }
 
   header.topbar{
@@ -108,17 +119,17 @@
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    padding-bottom:16px;
+    padding-bottom:18px;
     border-bottom:1px solid var(--line);
   }
   .brand{
     display:flex;
     flex-direction:column;
-    gap:2px;
+    gap:3px;
   }
   .brand .title{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:19px;
+    font-size:20px;
     font-weight:600;
     letter-spacing:0.01em;
   }
@@ -132,14 +143,14 @@
   }
   .navtabs button{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:12.5px;
+    font-size:13px;
     letter-spacing:0.06em;
     text-transform:uppercase;
     font-weight:600;
     border:none;
     background:transparent;
     color:var(--ink-soft);
-    padding:7px 14px;
+    padding:10px 16px;
     border-radius:999px;
     cursor:pointer;
     transition:background .15s ease, color .15s ease;
@@ -149,13 +160,27 @@
     color:var(--paper);
   }
   .navtabs button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .backlink{
+    display:inline-flex;
+    align-items:center;
+    font-family:'Oswald', 'Arial Narrow', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    color:var(--ink-faint);
+    text-decoration:none;
+    margin:-4px 0 1px -2px;
+    padding:4px 2px;
+  }
+  .backlink:hover{color:var(--ink);}
+  .backlink:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px;}
 
   /* ---------- road progress ---------- */
   .roadwrap{display:flex; align-items:center; gap:12px;}
   .roadbar{
     position:relative;
     flex:1;
-    height:10px;
+    height:12px;
     border-radius:999px;
     background:var(--line);
     overflow:hidden;
@@ -171,7 +196,7 @@
   }
   .roadstat{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:13px;
+    font-size:14px;
     font-weight:600;
     color:var(--ink-soft);
     white-space:nowrap;
@@ -179,7 +204,7 @@
   }
   .scoreping{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:13px;
+    font-size:14px;
     font-weight:600;
     color:var(--good);
     white-space:nowrap;
@@ -192,16 +217,16 @@
     border:1px solid var(--line);
     border-radius:var(--radius-lg);
     box-shadow:var(--shadow);
-    padding:28px;
+    padding:30px;
   }
 
   /* ---------- start screen ---------- */
   .hero{
     display:flex;
     flex-direction:column;
-    gap:18px;
+    gap:20px;
     align-items:flex-start;
-    padding:40px 32px;
+    padding:42px 34px;
   }
   .hero .sign{
     display:inline-flex;
@@ -211,25 +236,25 @@
     color:var(--accent-ink);
     border:1px solid var(--good-line);
     border-color:rgba(217,146,44,0.4);
-    padding:5px 12px 5px 10px;
+    padding:6px 13px 6px 11px;
     border-radius:999px;
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:12px;
+    font-size:12.5px;
     font-weight:600;
     letter-spacing:0.06em;
     text-transform:uppercase;
   }
   .hero h1{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:42px;
-    line-height:1.05;
+    font-size:clamp(28px, 6.2vw, 43px);
+    line-height:1.1;
     font-weight:700;
     margin:0;
     text-wrap:balance;
   }
   .hero p.lede{
-    font-size:17px;
-    line-height:1.55;
+    font-size:18px;
+    line-height:1.6;
     color:var(--ink-soft);
     max-width:52ch;
     margin:0;
@@ -237,22 +262,22 @@
   .hero .facts{
     display:flex;
     flex-wrap:wrap;
-    gap:10px 22px;
+    gap:12px 24px;
     margin-top:4px;
   }
   .hero .fact{
     display:flex;
     flex-direction:column;
-    gap:1px;
+    gap:2px;
   }
   .hero .fact b{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:22px;
+    font-size:24px;
     font-weight:700;
     font-variant-numeric:tabular-nums;
   }
   .hero .fact span{
-    font-size:12px;
+    font-size:12.5px;
     color:var(--ink-faint);
     text-transform:uppercase;
     letter-spacing:0.06em;
@@ -263,30 +288,36 @@
     align-items:center;
     gap:14px;
     margin-top:10px;
+    width:100%;
   }
   label.shuffle{
     display:inline-flex;
     align-items:center;
-    gap:8px;
-    font-size:14px;
+    gap:9px;
+    font-size:15px;
     color:var(--ink-soft);
     cursor:pointer;
     user-select:none;
+    padding:6px 0;
   }
-  label.shuffle input{accent-color:var(--accent); width:16px; height:16px;}
+  label.shuffle input{accent-color:var(--accent); width:19px; height:19px;}
   .best{
-    font-size:13.5px;
+    font-size:14.5px;
     color:var(--ink-faint);
   }
   .best b{color:var(--good); font-variant-numeric:tabular-nums;}
 
   .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
     font-family:'Oswald', 'Arial Narrow', sans-serif;
     font-weight:600;
-    font-size:15px;
+    font-size:16px;
     letter-spacing:0.02em;
     border-radius:999px;
-    padding:13px 26px;
+    padding:14px 28px;
+    min-height:50px;
     border:1px solid transparent;
     cursor:pointer;
     transition:transform .12s ease, box-shadow .12s ease, background .15s ease, border-color .15s ease;
@@ -304,22 +335,22 @@
     border-color:var(--line-strong);
   }
   .btn-ghost:hover{background:var(--surface);}
-  .btn-sm{padding:9px 18px; font-size:13px;}
+  .btn-sm{padding:11px 20px; font-size:14px; min-height:44px;}
 
   /* ---------- quiz screen ---------- */
   .qnum{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:13px;
+    font-size:13.5px;
     font-weight:600;
     color:var(--accent);
     letter-spacing:0.04em;
-    margin-bottom:10px;
+    margin-bottom:12px;
   }
   .qtext{
-    font-size:19px;
-    line-height:1.45;
+    font-size:clamp(19px, 4.6vw, 22px);
+    line-height:1.5;
     font-weight:700;
-    margin:0 0 6px;
+    margin:0 0 8px;
     text-wrap:balance;
   }
 
@@ -329,7 +360,7 @@
     max-width:100%;
     border-radius:var(--radius-md);
     border:1px solid var(--line);
-    margin:2px 0 16px;
+    margin:4px 0 18px;
     box-shadow:var(--shadow);
   }
   .limg{
@@ -344,32 +375,32 @@
     display:inline-flex;
     align-items:center;
     gap:6px;
-    font-size:12.5px;
+    font-size:13px;
     color:var(--ink-faint);
     background:var(--surface);
     border:1px dashed var(--line-strong);
     border-radius:999px;
-    padding:4px 11px;
-    margin-bottom:14px;
+    padding:5px 12px;
+    margin-bottom:16px;
   }
   .options{
     display:flex;
     flex-direction:column;
-    gap:10px;
-    margin-top:18px;
+    gap:12px;
+    margin-top:20px;
   }
   .opt{
     display:flex;
     align-items:flex-start;
-    gap:12px;
+    gap:14px;
     width:100%;
     text-align:left;
     background:var(--surface);
     border:1.5px solid var(--line);
     border-radius:var(--radius-md);
-    padding:13px 16px;
-    font-size:15.5px;
-    line-height:1.4;
+    padding:16px 18px;
+    font-size:17px;
+    line-height:1.5;
     color:var(--ink);
     cursor:pointer;
     font-family:inherit;
@@ -380,97 +411,99 @@
   .opt:disabled{cursor:default;}
   .opt .badge{
     flex:0 0 auto;
-    width:26px; height:26px;
+    width:30px; height:30px;
     border-radius:50%;
     border:1.5px solid var(--line-strong);
     display:flex; align-items:center; justify-content:center;
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:13px;
+    font-size:14px;
     font-weight:600;
     color:var(--ink-soft);
     transition:border-color .15s ease, background .15s ease, color .15s ease;
   }
-  .opt .otext{flex:1; padding-top:2px;}
-  .opt .mark{flex:0 0 auto; font-size:16px; padding-top:1px; opacity:0; transform:scale(.6); transition:opacity .15s ease, transform .15s ease;}
+  .opt .otext{flex:1; padding-top:3px;}
+  .opt .mark{flex:0 0 auto; font-size:18px; padding-top:2px; opacity:0; transform:scale(.6); transition:opacity .15s ease, transform .15s ease;}
   .opt.correct{background:var(--good-soft); border-color:var(--good-line);}
-  .opt.correct .badge{background:var(--good); border-color:var(--good); color:#fff;}
+  .opt.correct .badge{background:var(--good); border-color:var(--good); color:var(--good-ink);}
   .opt.correct .mark{opacity:1; transform:scale(1); color:var(--good);}
   .opt.wrong{background:var(--bad-soft); border-color:var(--bad-line);}
-  .opt.wrong .badge{background:var(--bad); border-color:var(--bad); color:#fff;}
+  .opt.wrong .badge{background:var(--bad); border-color:var(--bad); color:var(--bad-ink);}
   .opt.wrong .mark{opacity:1; transform:scale(1); color:var(--bad);}
   .opt.dim{opacity:.55;}
 
   .explain{
-    margin-top:18px;
-    padding:16px 18px;
+    margin-top:20px;
+    padding:18px 20px;
     border-radius:var(--radius-md);
     background:var(--surface);
     border:1px solid var(--line);
     border-left:4px solid var(--accent);
-    font-size:14.5px;
-    line-height:1.6;
+    font-size:15.5px;
+    line-height:1.7;
     color:var(--ink-soft);
     display:none;
   }
   .explain.show{display:block;}
-  .explain b{color:var(--ink); font-family:'Oswald','Arial Narrow',sans-serif; font-weight:600; letter-spacing:.02em; font-size:12px; text-transform:uppercase; display:block; margin-bottom:6px;}
+  .explain b{color:var(--ink); font-family:'Oswald','Arial Narrow',sans-serif; font-weight:600; letter-spacing:.02em; font-size:12.5px; text-transform:uppercase; display:block; margin-bottom:7px;}
 
   .quizfoot{
     display:flex;
-    justify-content:space-between;
+    flex-wrap:wrap;
     align-items:center;
-    margin-top:22px;
+    gap:10px;
+    margin-top:26px;
   }
-  .quizfoot .spacer{flex:1;}
+  .quizfoot .spacer{flex:1 1 auto;}
 
   /* ---------- summary ---------- */
   .summary{
     text-align:center;
-    padding:44px 28px;
+    padding:46px 30px;
   }
   .summary .big{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:64px;
+    font-size:clamp(46px, 13vw, 64px);
     font-weight:700;
     line-height:1;
     font-variant-numeric:tabular-nums;
   }
-  .summary .big small{font-size:28px; color:var(--ink-faint); font-weight:600;}
+  .summary .big small{font-size:clamp(22px, 6vw, 28px); color:var(--ink-faint); font-weight:600;}
   .summary .pct{
     font-family:'Oswald', 'Arial Narrow', sans-serif;
-    font-size:16px;
+    font-size:16.5px;
     font-weight:600;
     color:var(--ink-soft);
     letter-spacing:.03em;
     text-transform:uppercase;
-    margin-top:2px;
+    margin-top:4px;
   }
   .summary .verdict{
-    margin:18px auto 0;
+    margin:20px auto 0;
     max-width:44ch;
-    font-size:15px;
+    font-size:16px;
     color:var(--ink-soft);
-    line-height:1.5;
+    line-height:1.6;
   }
-  .missedwrap{margin-top:26px; text-align:left;}
+  .missedwrap{margin-top:28px; text-align:left;}
   .missedwrap h3{
     font-family:'Oswald','Arial Narrow',sans-serif;
-    font-size:13px;
+    font-size:13.5px;
     text-transform:uppercase;
     letter-spacing:.06em;
     color:var(--ink-faint);
-    margin:0 0 10px;
+    margin:0 0 12px;
   }
-  .chiprow{display:flex; flex-wrap:wrap; gap:8px;}
+  .chiprow{display:flex; flex-wrap:wrap; gap:9px;}
   .chip{
     font-family:'Oswald','Arial Narrow',sans-serif;
-    font-size:13px;
+    font-size:14px;
     font-weight:600;
     border:1.5px solid var(--bad-line);
     background:var(--bad-soft);
     color:var(--bad);
     border-radius:8px;
-    padding:6px 11px;
+    padding:9px 14px;
+    min-height:40px;
     cursor:pointer;
     font-variant-numeric:tabular-nums;
   }
@@ -479,7 +512,7 @@
     display:flex;
     gap:12px;
     justify-content:center;
-    margin-top:30px;
+    margin-top:32px;
     flex-wrap:wrap;
   }
 
@@ -490,7 +523,7 @@
     justify-content:space-between;
     gap:12px;
   }
-  .listmeta p{margin:0; font-size:14px; color:var(--ink-soft);}
+  .listmeta p{margin:0; font-size:15px; color:var(--ink-soft); line-height:1.5;}
   .listitems{display:flex; flex-direction:column; gap:12px;}
   .litem{
     background:var(--surface-raised);
@@ -506,71 +539,113 @@
     font:inherit;
     color:inherit;
     cursor:pointer;
-    padding:16px 18px;
+    padding:18px 18px;
     display:flex;
-    gap:12px;
+    gap:14px;
   }
   .litem .lnum{
     flex:0 0 auto;
     font-family:'Oswald','Arial Narrow',sans-serif;
     font-weight:600;
-    font-size:13px;
+    font-size:13.5px;
     color:var(--ink-faint);
     padding-top:3px;
-    min-width:26px;
+    min-width:28px;
     font-variant-numeric:tabular-nums;
   }
   .litem .lbody{flex:1;}
-  .litem .lqtext{font-size:15px; font-weight:700; line-height:1.4; margin:0 0 8px;}
-  .litem .lopts{display:flex; flex-direction:column; gap:4px;}
-  .litem .lopt{font-size:13.5px; color:var(--ink-soft); line-height:1.4;}
+  .litem .lqtext{font-size:16.5px; font-weight:700; line-height:1.5; margin:0 0 9px;}
+  .litem .lopts{display:flex; flex-direction:column; gap:6px;}
+  .litem .lopt{font-size:15px; color:var(--ink-soft); line-height:1.5;}
   .litem .lopt.correct{color:var(--good); font-weight:700;}
   .litem .lopt .lletter{font-weight:700; margin-right:4px;}
   .litem .chevron{flex:0 0 auto; color:var(--ink-faint); transition:transform .15s ease; padding-top:3px;}
   .litem.open .chevron{transform:rotate(180deg);}
   .litem .lexplain{
     display:none;
-    padding:0 18px 18px 56px;
-    font-size:13.5px;
-    line-height:1.6;
+    padding:0 18px 20px 60px;
+    font-size:15px;
+    line-height:1.7;
     color:var(--ink-soft);
   }
   .litem.open .lexplain{display:block;}
-  .litem .lexplain b{color:var(--ink); font-family:'Oswald','Arial Narrow',sans-serif; font-weight:600; letter-spacing:.02em; font-size:11.5px; text-transform:uppercase; display:block; margin-bottom:5px;}
-  .litem .limgnote{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--ink-faint); background:var(--paper); border:1px dashed var(--line-strong); border-radius:999px; padding:2px 8px; margin-bottom:8px;}
+  .litem .lexplain b{color:var(--ink); font-family:'Oswald','Arial Narrow',sans-serif; font-weight:600; letter-spacing:.02em; font-size:12px; text-transform:uppercase; display:block; margin-bottom:6px;}
+  .litem .limgnote{display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--ink-faint); background:var(--paper); border:1px dashed var(--line-strong); border-radius:999px; padding:3px 9px; margin-bottom:9px;}
 
   footer.foot{
     text-align:center;
-    font-size:12.5px;
+    font-size:13.5px;
     color:var(--ink-faint);
-    padding-top:8px;
+    padding-top:10px;
+    line-height:1.5;
   }
   footer.foot a{color:var(--ink-soft);}
 
   [hidden]{display:none !important;}
 
-  @media (max-width:560px){
-    .hero{padding:30px 22px;}
-    .hero h1{font-size:32px;}
-    .card{padding:20px;}
-    .summary .big{font-size:50px;}
+  @media (max-width:640px){
+    .shell{padding:22px 16px 90px; gap:18px;}
+    header.topbar{padding-bottom:14px;}
+    .brand .title{font-size:17.5px;}
+    .navtabs button{padding:9px 13px; font-size:12px;}
+    .theme-toggle{width:34px; height:34px; font-size:14px;}
+    .roadstat, .scoreping{font-size:12.5px;}
+    .card{padding:20px 18px;}
+    .hero{padding:26px 20px; gap:16px;}
+    .hero p.lede{font-size:16.5px;}
+    .hero .fact b{font-size:21px;}
+    .startrow{flex-direction:column; align-items:stretch;}
+    .startrow .btn{width:100%;}
+    label.shuffle{justify-content:center;}
+    .opt{padding:15px 15px; gap:12px;}
+    .explain{padding:16px 16px;}
+    .quizfoot .spacer{flex-basis:100%; height:0; order:1;}
+    #btn-next{order:0; flex:1 1 100%;}
+    #btn-back{order:2; flex:1 1 0;}
+    #btn-quit{order:3; flex:1 1 0;}
+    .summary{padding:34px 20px;}
+    .summaryactions{flex-direction:column-reverse; align-items:stretch;}
+    .summaryactions .btn{width:100%;}
+    .litem > button.lq{padding:16px 14px; gap:12px;}
+    .litem .lexplain{padding:0 14px 18px 54px;}
   }
 
   @media (prefers-reduced-motion: reduce){
     *{transition-duration:0.001ms !important; animation-duration:0.001ms !important;}
   }
+  .theme-toggle{
+    flex:0 0 auto;
+    width:38px; height:38px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink-soft);
+    font-size:16px;
+    line-height:1;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s ease, color .15s ease, transform .1s ease;
+  }
+  .theme-toggle:hover{border-color:var(--line-strong); color:var(--ink);}
+  .theme-toggle:active{transform:scale(0.92);}
+  .theme-toggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .topbar-actions{display:flex; align-items:center; gap:10px;}
 </style>
 
 <div class="shell">
   <header class="topbar">
     <div class="brand">
+      <a class="backlink" href="index.html">← Усі теми</a>
       <span class="eyebrow">ПДР · Тема 23</span>
       <span class="title">Буксирування та експлуатація транспортних составів</span>
     </div>
-    <nav class="navtabs" id="navtabs" aria-label="Режим">
-      <button data-view="start" aria-selected="true">Тест</button>
-      <button data-view="list" aria-selected="false">Список</button>
-    </nav>
+    <div class="topbar-actions">
+      <nav class="navtabs" id="navtabs" aria-label="Режим">
+        <button data-view="start" aria-selected="true">Тест</button>
+        <button data-view="list" aria-selected="false">Список</button>
+      </nav>
+      <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Перемкнути тему"></button>
+    </div>
   </header>
 
   <!-- START -->
@@ -586,6 +661,7 @@
       </div>
       <div class="startrow">
         <button class="btn btn-primary" id="btn-start">Почати тест</button>
+        <button class="btn btn-ghost" id="btn-continue" hidden>Продовжити (питання <span id="continue-pos"></span>)</button>
         <label class="shuffle"><input type="checkbox" id="chk-shuffle"> Перемішати питання</label>
       </div>
       <div class="best" id="best-line" hidden>Найкращий результат: <b id="best-value">—</b></div>
@@ -607,6 +683,7 @@
       <div class="explain" id="quiz-explain"><b>Пояснення</b><span id="quiz-explain-text"></span></div>
       <div class="quizfoot">
         <button class="btn btn-ghost btn-sm" id="btn-quit">Завершити достроково</button>
+        <button class="btn btn-ghost btn-sm" id="btn-back" disabled>← Назад</button>
         <div class="spacer"></div>
         <button class="btn btn-primary" id="btn-next" disabled>Далі</button>
       </div>
@@ -650,8 +727,11 @@
   "use strict";
   var QUESTIONS = JSON.parse(document.getElementById('quiz-data').textContent);
   var TOTAL = QUESTIONS.length;
+  var QMAP = {};
+  QUESTIONS.forEach(function(q){ QMAP[q.id] = q; });
 
   var LS_KEY = 'pdr_t23_best_v1';
+  var LS_KEY_PROGRESS = LS_KEY.replace(/_best_v1$/, '_progress_v1');
   function loadBest(){
     try{
       var raw = localStorage.getItem(LS_KEY);
@@ -667,6 +747,30 @@
       }
     }catch(e){ /* ignore */ }
   }
+  function loadProgress(){
+    try{
+      var raw = localStorage.getItem(LS_KEY_PROGRESS);
+      if(!raw) return null;
+      var p = JSON.parse(raw);
+      if(!p || !Array.isArray(p.orderIds) || p.orderIds.length !== TOTAL) return null;
+      if(!p.orderIds.every(function(id){ return QMAP.hasOwnProperty(id); })) return null;
+      if(!Array.isArray(p.answers) || p.answers.length !== TOTAL) return null;
+      return p;
+    }catch(e){ return null; }
+  }
+  function saveProgress(){
+    try{
+      localStorage.setItem(LS_KEY_PROGRESS, JSON.stringify({
+        orderIds: order.map(function(q){ return q.id; }),
+        answers: answers,
+        qi: qi,
+        date: new Date().toISOString()
+      }));
+    }catch(e){ /* ignore */ }
+  }
+  function clearProgress(){
+    try{ localStorage.removeItem(LS_KEY_PROGRESS); }catch(e){ /* ignore */ }
+  }
 
   var els = {
     navtabs: document.getElementById('navtabs'),
@@ -676,6 +780,8 @@
     viewList: document.getElementById('view-list'),
     factImages: document.getElementById('fact-images'),
     btnStart: document.getElementById('btn-start'),
+    btnContinue: document.getElementById('btn-continue'),
+    continuePos: document.getElementById('continue-pos'),
     chkShuffle: document.getElementById('chk-shuffle'),
     bestLine: document.getElementById('best-line'),
     bestValue: document.getElementById('best-value'),
@@ -689,6 +795,7 @@
     quizExplain: document.getElementById('quiz-explain'),
     quizExplainText: document.getElementById('quiz-explain-text'),
     btnNext: document.getElementById('btn-next'),
+    btnBack: document.getElementById('btn-back'),
     btnQuit: document.getElementById('btn-quit'),
     sumScore: document.getElementById('sum-score'),
     sumTotal: document.getElementById('sum-total'),
@@ -704,10 +811,27 @@
   els.factImages.textContent = QUESTIONS.filter(function(q){return q.hasImage;}).length;
 
   var best = loadBest();
-  if(best){
-    els.bestLine.hidden = false;
-    els.bestValue.textContent = best.score + '/' + best.total + ' (' + Math.round(best.score/best.total*100) + '%)';
+  function refreshBestLine(){
+    best = loadBest();
+    if(best){
+      els.bestLine.hidden = false;
+      els.bestValue.textContent = best.score + '/' + best.total + ' (' + Math.round(best.score/best.total*100) + '%)';
+    } else {
+      els.bestLine.hidden = true;
+    }
   }
+  refreshBestLine();
+
+  function refreshContinueButton(){
+    var p = loadProgress();
+    if(p){
+      els.btnContinue.hidden = false;
+      els.continuePos.textContent = (p.qi+1) + '/' + TOTAL;
+    } else {
+      els.btnContinue.hidden = true;
+    }
+  }
+  refreshContinueButton();
 
   function shuffle(arr){
     var a = arr.slice();
@@ -732,29 +856,50 @@
     var btn = e.target.closest('button[data-view]');
     if(!btn) return;
     if(btn.getAttribute('data-view')==='list'){ renderList(); showView('list'); }
-    else { showView('start'); }
+    else { refreshBestLine(); refreshContinueButton(); showView('start'); }
   });
 
   /* ---------------- quiz engine ---------------- */
   var order = [];
   var qi = 0;
-  var score = 0;
-  var missed = [];
-  var answered = false;
+  var answers = [];
+
+  function computeScore(){
+    var s = 0;
+    answers.forEach(function(a){ if(a && a.correct) s++; });
+    return s;
+  }
+  function computeMissed(){
+    var m = [];
+    answers.forEach(function(a, idx){ if(a && !a.correct) m.push(order[idx]); });
+    return m;
+  }
 
   function startQuiz(){
     order = els.chkShuffle.checked ? shuffle(QUESTIONS) : QUESTIONS.slice();
-    qi = 0; score = 0; missed = [];
+    qi = 0;
+    answers = new Array(TOTAL).fill(null);
+    showView('quiz');
+    saveProgress();
+    renderQuestion();
+  }
+
+  function resumeQuiz(){
+    var p = loadProgress();
+    if(!p) return;
+    order = p.orderIds.map(function(id){ return QMAP[id]; });
+    answers = p.answers.slice();
+    qi = Math.min(p.qi, TOTAL-1);
     showView('quiz');
     renderQuestion();
   }
 
   function renderQuestion(){
     var q = order[qi];
-    answered = false;
+    var existingAnswer = answers[qi];
     els.quizPos.textContent = (qi+1) + ' / ' + TOTAL;
     els.quizFill.style.width = (((qi)/TOTAL)*100) + '%';
-    els.quizScore.textContent = score + ' ✓';
+    els.quizScore.textContent = computeScore() + ' ✓';
     els.quizQnum.textContent = 'ПИТАННЯ ' + q.id;
     els.quizQtext.textContent = q.text;
     var existingImg = els.quizQtext.parentNode.querySelector('.qimg');
@@ -769,10 +914,11 @@
     } else {
       els.quizImgnote.hidden = !q.hasImage;
     }
-    els.quizExplain.classList.remove('show');
+    els.quizExplain.classList.toggle('show', !!existingAnswer);
     els.quizExplainText.textContent = q.explanation || 'Пояснення до цього питання відсутнє в базі сайту.';
-    els.btnNext.disabled = true;
+    els.btnNext.disabled = !existingAnswer;
     els.btnNext.textContent = (qi === TOTAL-1) ? 'Завершити' : 'Далі';
+    els.btnBack.disabled = (qi === 0);
 
     els.quizOptions.innerHTML = '';
     q.options.forEach(function(opt){
@@ -780,15 +926,21 @@
       b.className = 'opt';
       b.innerHTML = '<span class="badge">'+opt.letter+'</span><span class="otext"></span><span class="mark">✓</span>';
       b.querySelector('.otext').textContent = opt.text;
-      b.addEventListener('click', function(){ selectOption(b, opt, q); });
+      if(existingAnswer){
+        b.disabled = true;
+        if(opt.correct){ b.classList.add('correct'); }
+        else if(opt.letter === existingAnswer.letter){ b.classList.add('wrong'); }
+        else { b.classList.add('dim'); }
+      } else {
+        b.addEventListener('click', function(){ selectOption(b, opt, q); });
+      }
       els.quizOptions.appendChild(b);
     });
   }
 
   function selectOption(btn, opt, q){
-    if(answered) return;
-    answered = true;
-    if(opt.correct){ score++; } else { missed.push(q); }
+    if(answers[qi]) return;
+    answers[qi] = {letter: opt.letter, correct: !!opt.correct};
     Array.prototype.forEach.call(els.quizOptions.children, function(el, idx){
       var o = q.options[idx];
       el.disabled = true;
@@ -796,20 +948,29 @@
       else if(el===btn){ el.classList.add('wrong'); }
       else { el.classList.add('dim'); }
     });
-    els.quizScore.textContent = score + ' ✓';
+    els.quizScore.textContent = computeScore() + ' ✓';
     els.quizExplain.classList.add('show');
     els.btnNext.disabled = false;
     els.btnNext.focus();
+    saveProgress();
   }
 
   els.btnNext.addEventListener('click', function(){
-    if(!answered) return;
+    if(!answers[qi]) return;
     if(qi === TOTAL-1){
       finishQuiz();
     } else {
       qi++;
       renderQuestion();
+      saveProgress();
     }
+  });
+
+  els.btnBack.addEventListener('click', function(){
+    if(qi === 0) return;
+    qi--;
+    renderQuestion();
+    saveProgress();
   });
 
   els.btnQuit.addEventListener('click', function(){
@@ -819,15 +980,19 @@
   });
 
   function finishQuiz(){
+    var score = computeScore();
+    var missed = computeMissed();
     els.quizFill.style.width = '100%';
     saveBest(score, TOTAL);
-    best = loadBest();
+    clearProgress();
+    refreshBestLine();
+    refreshContinueButton();
     els.sumScore.textContent = score;
     els.sumTotal.textContent = TOTAL;
     var pct = Math.round(score/TOTAL*100);
     els.sumPct.textContent = pct + '%';
     var verdict;
-    if(pct === 100) verdict = 'Ідеально. Тема 1 закрита — можна переходити далі за планом.';
+    if(pct === 100) verdict = 'Ідеально. Тема закрита — можна переходити далі за планом.';
     else if(pct >= 90) verdict = 'Дуже добре. Повтори пояснення до пропущених питань і тема закрита.';
     else if(pct >= 70) verdict = 'Непогано, але ще є прогалини. Переглянь пояснення нижче і пройди тест ще раз.';
     else verdict = 'Тему варто повторити за конспектом лекції, перш ніж переходити далі.';
@@ -858,6 +1023,7 @@
   }
 
   els.btnStart.addEventListener('click', startQuiz);
+  els.btnContinue.addEventListener('click', resumeQuiz);
   els.btnRetry.addEventListener('click', startQuiz);
   els.btnToList.addEventListener('click', function(){ renderList(); showView('list'); });
 
@@ -936,5 +1102,29 @@
     });
     els.listItems.appendChild(frag);
   }
+})();
+</script>
+<script>
+(function(){
+  var THEME_KEY = 'pdr_theme';
+  var btn = document.getElementById('theme-toggle');
+  if(!btn) return;
+  function currentTheme(){
+    var stored = null;
+    try{ stored = localStorage.getItem(THEME_KEY); }catch(e){}
+    if(stored === 'light' || stored === 'dark') return stored;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  function applyIcon(theme){
+    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    btn.setAttribute('aria-label', theme === 'dark' ? 'Світла тема' : 'Темна тема');
+  }
+  applyIcon(currentTheme());
+  btn.addEventListener('click', function(){
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+    applyIcon(next);
+  });
 })();
 </script>
