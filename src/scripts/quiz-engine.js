@@ -1,9 +1,8 @@
 (function(){
   "use strict";
-  var QUESTIONS = JSON.parse(document.getElementById('quiz-data').textContent);
-  var TOTAL = QUESTIONS.length;
+  var QUESTIONS = [];
+  var TOTAL = 0;
   var QMAP = {};
-  QUESTIONS.forEach(function(q){ QMAP[q.id] = q; });
 
   var LS_KEY = 'pdr_t' + window.PDR_TOPIC_ID + '_best_v1';
   var LS_KEY_PROGRESS = LS_KEY.replace(/_best_v1$/, '_progress_v1');
@@ -83,8 +82,6 @@
     listItems: document.getElementById('list-items')
   };
 
-  els.factImages.textContent = QUESTIONS.filter(function(q){return q.hasImage;}).length;
-
   var best = loadBest();
   function refreshBestLine(){
     best = loadBest();
@@ -106,7 +103,6 @@
       els.btnContinue.hidden = true;
     }
   }
-  refreshContinueButton();
 
   function shuffle(arr){
     var a = arr.slice();
@@ -130,8 +126,13 @@
   els.navtabs.addEventListener('click', function(e){
     var btn = e.target.closest('button[data-view]');
     if(!btn) return;
-    if(btn.getAttribute('data-view')==='list'){ renderList(); showView('list'); }
-    else { refreshBestLine(); refreshContinueButton(); showView('start'); }
+    if(btn.getAttribute('data-view')==='list'){
+      dataReady.then(function(){ renderList(); showView('list'); });
+    } else {
+      refreshBestLine();
+      dataReady.then(refreshContinueButton);
+      showView('start');
+    }
   });
 
   /* ---------------- quiz engine ---------------- */
@@ -196,10 +197,10 @@
     els.btnBack.disabled = (qi === 0);
 
     els.quizOptions.innerHTML = '';
-    q.options.forEach(function(opt){
+    q.options.forEach(function(opt, optIdx){
       var b = document.createElement('button');
       b.className = 'opt';
-      b.innerHTML = '<span class="badge">'+opt.letter+'</span><span class="otext"></span><span class="mark">✓</span>';
+      b.innerHTML = '<span class="badge">'+(optIdx+1)+'</span><span class="otext"></span><span class="mark">✓</span>';
       b.querySelector('.otext').textContent = opt.text;
       if(existingAnswer){
         b.disabled = true;
@@ -216,6 +217,7 @@
   function selectOption(btn, opt, q){
     if(answers[qi]) return;
     answers[qi] = {letter: opt.letter, correct: !!opt.correct};
+    if(!opt.correct && window.PDRMistakes){ window.PDRMistakes.recordWrong(window.PDR_TOPIC_ID, q.id); }
     Array.prototype.forEach.call(els.quizOptions.children, function(el, idx){
       var o = q.options[idx];
       el.disabled = true;
@@ -322,10 +324,13 @@
     showView('summary');
   }
 
-  els.btnStart.addEventListener('click', startQuiz);
-  els.btnContinue.addEventListener('click', resumeQuiz);
-  els.btnRetry.addEventListener('click', startQuiz);
-  els.btnToList.addEventListener('click', function(){ renderList(); showView('list'); });
+  els.btnStart.addEventListener('click', function(){
+    els.btnStart.disabled = true;
+    dataReady.then(function(){ els.btnStart.disabled = false; startQuiz(); });
+  });
+  els.btnContinue.addEventListener('click', function(){ dataReady.then(resumeQuiz); });
+  els.btnRetry.addEventListener('click', function(){ dataReady.then(startQuiz); });
+  els.btnToList.addEventListener('click', function(){ dataReady.then(function(){ renderList(); showView('list'); }); });
 
   /* ---------------- list mode ---------------- */
   var listRendered = false;
@@ -369,10 +374,10 @@
 
       var opts = document.createElement('div');
       opts.className = 'lopts';
-      q.options.forEach(function(o){
+      q.options.forEach(function(o, oIdx){
         var row = document.createElement('div');
         row.className = 'lopt' + (o.correct ? ' correct':'');
-        row.innerHTML = '<span class="lletter">'+o.letter+')</span>';
+        row.innerHTML = '<span class="lletter">'+(oIdx+1)+')</span>';
         row.appendChild(document.createTextNode(o.text + (o.correct ? '  ✓':'')));
         opts.appendChild(row);
       });
@@ -402,4 +407,16 @@
     });
     els.listItems.appendChild(frag);
   }
+
+  /* ---------------- load this topic's question bank, then unlock what depends on it ---------------- */
+  var dataReady = window.PDRTopicLoader.loadTopic(window.PDR_TOPIC_ID).then(function(qs){
+    QUESTIONS = qs;
+    TOTAL = QUESTIONS.length;
+    QUESTIONS.forEach(function(q){ QMAP[q.id] = q; });
+    els.factImages.textContent = QUESTIONS.filter(function(q){ return q.hasImage; }).length;
+    refreshContinueButton();
+  }).catch(function(err){
+    console.error('Не вдалося завантажити банк питань:', err);
+    els.btnStart.textContent = 'Помилка завантаження питань';
+  });
 })();
