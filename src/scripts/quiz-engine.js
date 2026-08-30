@@ -6,11 +6,19 @@
 
   var LS_KEY = 'pdr_t' + window.PDR_TOPIC_ID + '_best_v1';
   var LS_KEY_PROGRESS = LS_KEY.replace(/_best_v1$/, '_progress_v1');
+  /* old option letters always matched the option's position in the array, so this is a
+     lossless way to migrate an old saved answer's letter into the new index-based shape */
+  var LETTER_TO_INDEX = {'а':0,'б':1,'в':2,'г':3,'д':4};
   function loadBest(){
     try{
       var raw = localStorage.getItem(LS_KEY);
       if(!raw) return null;
-      return JSON.parse(raw);
+      var b = JSON.parse(raw);
+      if(b && b.date && !b.timestamp){
+        b = {score: b.score, total: b.total, timestamp: new Date(b.date).getTime()};
+        localStorage.setItem(LS_KEY, JSON.stringify(b));
+      }
+      return b;
     }catch(e){ return null; }
   }
   function saveBest(score,total){
@@ -26,6 +34,20 @@
       var raw = localStorage.getItem(LS_KEY_PROGRESS);
       if(!raw) return null;
       var p = JSON.parse(raw);
+      /* old shape: {orderIds, answers:[{letter,correct}|null], qi, date} */
+      if(p && Array.isArray(p.orderIds)){
+        p = {
+          order_ids: p.orderIds,
+          answers: (p.answers || []).map(function(a){
+            if(a === null || a === undefined) return null;
+            if(typeof a === 'number') return a;
+            return LETTER_TO_INDEX.hasOwnProperty(a.letter) ? LETTER_TO_INDEX[a.letter] : null;
+          }),
+          question_index: p.qi || 0,
+          timestamp: p.date ? new Date(p.date).getTime() : Date.now()
+        };
+        localStorage.setItem(LS_KEY_PROGRESS, JSON.stringify(p));
+      }
       if(!p || !Array.isArray(p.order_ids) || p.order_ids.length !== TOTAL) return null;
       if(!p.order_ids.every(function(id){ return QMAP.hasOwnProperty(id); })) return null;
       if(!Array.isArray(p.answers) || p.answers.length !== TOTAL) return null;

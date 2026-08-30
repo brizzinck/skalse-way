@@ -82,7 +82,15 @@
   function loadLastResult(){
     try{
       var raw = localStorage.getItem(LAST_RESULT_KEY);
-      return raw ? JSON.parse(raw) : null;
+      if(!raw) return null;
+      var r = JSON.parse(raw);
+      /* old shape used "date" (ISO string) and "timedOut" (camelCase) */
+      if(r && r.date && !r.timestamp){
+        r = {score: r.score, total: r.total, wrong: r.wrong, passed: r.passed,
+             timestamp: new Date(r.date).getTime(), timed_out: !!r.timedOut};
+        saveLastResult(r);
+      }
+      return r;
     }catch(e){ return null; }
   }
   function saveLastResult(r){
@@ -98,12 +106,28 @@
   }
 
   /* ---------------- recent-exam history (avoids near-term repeats) ---------------- */
-  /* each history entry is {topic_id: <number>, question_id: <number>} - no strings */
+  /* each history entry is {topic_id: <number>, question_id: <number>} - no strings.
+     old shape was a plain "topicId:qid" string (e.g. "16_2:4") - detect and migrate once. */
   function getRecentHistory(){
     try{
       var raw = localStorage.getItem(RECENT_KEY);
       var arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) ? arr : [];
+      if(!Array.isArray(arr)) return [];
+      var changed = false;
+      var migrated = arr.map(function(examRefs){
+        return examRefs.map(function(ref){
+          if(typeof ref === 'string'){
+            changed = true;
+            var parts = ref.split(':');
+            return {topic_id: topicNumId(parts[0]), question_id: parseInt(parts[1], 10)};
+          }
+          return ref;
+        });
+      });
+      if(changed){
+        try{ localStorage.setItem(RECENT_KEY, JSON.stringify(migrated)); }catch(e){ /* ignore */ }
+      }
+      return migrated;
     }catch(e){ return []; }
   }
   function saveRecentExam(refs){

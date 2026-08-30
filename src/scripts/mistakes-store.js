@@ -21,11 +21,26 @@
       var raw = localStorage.getItem(LS_KEY);
       if(!raw) return [];
       var list = JSON.parse(raw);
-      return Array.isArray(list) ? list : [];
+      if(!Array.isArray(list)) return [];
+      return migrateIfNeeded(list);
     }catch(e){ return []; }
   }
   function save(list){
     try{ localStorage.setItem(LS_KEY, JSON.stringify(list)); }catch(e){ /* ignore */ }
+  }
+  /* old shape (pre-optimization): {topicId: "16_2", qid, correctStreak} - detect it by the
+     camelCase topicId string and rewrite the whole list once, in place, to the new shape */
+  function migrateIfNeeded(list){
+    var changed = false;
+    var migrated = list.map(function(e){
+      if(e && typeof e.topicId === 'string'){
+        changed = true;
+        return {topic_id: topicNumId(e.topicId), question_id: e.qid, correct_streak: e.correctStreak || 0};
+      }
+      return e;
+    });
+    if(changed) save(migrated);
+    return migrated;
   }
   /* stored entry shape: {topic_id: <number>, question_id: <number>, correct_streak: <number>} -
      no strings, and no copy of the question itself */
