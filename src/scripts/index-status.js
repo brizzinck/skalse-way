@@ -33,4 +33,10 @@
     text.textContent = doneCount + '/' + total + ' тем завершено' +
       (progressCount ? ' · ' + progressCount + ' у процесі' : '');
   }
+
+  var mistakesCount = document.getElementById('mistakes-count');
+  if(mistakesCount && window.PDRMistakes){
+    var n = window.PDRMistakes.count();
+    mistakesCount.textContent = n ? (n + ' питань чекають на повторення') : 'Немає жодної помилки — так тримати';
+  }
 })();
