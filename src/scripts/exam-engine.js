@@ -43,7 +43,9 @@
     verdictBanner: document.getElementById('verdict-banner'),
     sumTimedout: document.getElementById('sum-timedout'),
     reviewItems: document.getElementById('review-items'),
-    btnAgain: document.getElementById('btn-again')
+    btnAgain: document.getElementById('btn-again'),
+    failToast: document.getElementById('fail-toast'),
+    quizCard: document.getElementById('quiz-card')
   };
 
   var views = {intro: els.viewIntro, quiz: els.viewQuiz, summary: els.viewSummary};
@@ -197,10 +199,15 @@
 
   /* ---------------- exam run state ---------------- */
   /* answers[i] is the 0-based index of the chosen option, or null if unanswered;
-     correctness is always derived from examSet[i].question.options[answers[i]].correct */
+     correctness is always derived from examSet[i].question.options[answers[i]].correct.
+     locked[i] is true once that question's answer has been saved (matching the real
+     exam's "save answer -> shows correct/wrong immediately, can't change after" flow) -
+     an unlocked selection is still changeable and doesn't count for the pass/fail tally. */
   var examSet = [];
   var qi = 0;
   var answers = [];
+  var locked = [];
+  var examFailed = false;
   var timerInterval = null;
   var timeLeft = 0;
   var finished = false;
@@ -216,14 +223,19 @@
       examSet = set;
       qi = 0;
       answers = new Array(examSet.length).fill(null);
+      locked = new Array(examSet.length).fill(false);
+      examFailed = false;
       finished = false;
       timedOut = false;
+      clearTimeout(failToastTimer);
+      if(els.failToast) els.failToast.classList.remove('show');
       els.btnStart.disabled = false;
       els.introLoading.hidden = true;
       showView('quiz');
       startTimer();
       renderQuestionGrid();
       renderQuestion();
+      scrollToQuestion();
     }).catch(function(err){
       els.introLoading.textContent = 'Не вдалося завантажити питання. Перевір з`єднання і спробуй ще раз.';
       els.btnStart.disabled = false;
@@ -255,8 +267,14 @@
 
   function answeredCount(){
     var n = 0;
-    answers.forEach(function(a){ if(a !== null) n++; });
+    locked.forEach(function(l){ if(l) n++; });
     return n;
+  }
+
+  function isLockedWrong(idx){
+    var entry = examSet[idx];
+    var chosen = answers[idx];
+    return !(chosen !== null && entry.question.options[chosen].correct);
   }
 
   function renderQuestionGrid(){
@@ -264,10 +282,23 @@
     examSet.forEach(function(entry, idx){
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'qgbtn' + (answers[idx] !== null ? ' answered' : '') + (idx===qi ? ' current' : '');
+      var cls = 'qgbtn' + (idx===qi ? ' current' : '');
+      if(locked[idx]) cls += isLockedWrong(idx) ? ' wrong' : ' correct';
+      b.className = cls;
       b.textContent = String(idx+1);
-      b.addEventListener('click', function(){ qi = idx; renderQuestion(); renderQuestionGrid(); });
+      b.addEventListener('click', function(){ qi = idx; renderQuestion(); renderQuestionGrid(); scrollToQuestion(); });
       els.qgrid.appendChild(b);
+    });
+  }
+
+  /* on a phone the timer bar + 20-button qgrid push the actual question below the
+     fold, so jumping to a question scrolls the question card to the top instead
+     of the page top - the question, not the number grid, is what you want to see first */
+  function scrollToQuestion(){
+    if(!els.quizCard) return;
+    els.quizCard.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
     });
   }
 
@@ -275,6 +306,7 @@
     var entry = examSet[qi];
     var q = entry.question;
     var chosen = answers[qi];
+    var isLocked = locked[qi];
     els.quizPos.textContent = (qi+1) + ' / ' + examSet.length;
     els.quizFill.style.width = ((qi/examSet.length)*100) + '%';
     els.answeredCount.textContent = answeredCount() + '/' + examSet.length;
@@ -287,38 +319,88 @@
       img.className = 'qimg';
       img.src = q.image;
       img.alt = 'Ілюстрація до питання';
+      /* the image's own height isn't known yet when scrollToQuestion() runs right
+         after render, so it can undershoot - correct the scroll once it loads */
+      img.addEventListener('load', scrollToQuestion);
       els.quizImgnote.insertAdjacentElement('afterend', img);
       els.quizImgnote.hidden = true;
     } else {
       els.quizImgnote.hidden = !q.has_image;
     }
     els.btnBack.disabled = (qi === 0);
-    els.btnNext.textContent = (qi === examSet.length-1) ? 'Завершити іспит' : 'Далі';
+    var isLast = (qi === examSet.length-1);
+    els.btnNext.textContent = (!isLocked && chosen !== null) ? 'Зберегти відповідь' : (isLast ? 'Завершити іспит' : 'Далі');
 
     els.quizOptions.innerHTML = '';
     q.options.forEach(function(opt, optIdx){
       var b = document.createElement('button');
-      b.className = 'opt' + (chosen === optIdx ? ' selected' : '');
+      var cls = 'opt';
+      if(isLocked){
+        b.disabled = true;
+        if(opt.correct){ cls += ' correct'; }
+        else if(optIdx === chosen){ cls += ' wrong'; }
+        else { cls += ' dim'; }
+      } else {
+        if(chosen === optIdx) cls += ' selected';
+        b.addEventListener('click', function(){ selectOption(optIdx); });
+      }
+      b.className = cls;
       b.innerHTML = '<span class="badge">'+(optIdx+1)+'</span><span class="otext"></span><span class="mark">✓</span>';
       b.querySelector('.otext').textContent = opt.text;
-      b.addEventListener('click', function(){ selectOption(optIdx); });
       els.quizOptions.appendChild(b);
     });
   }
 
   function selectOption(optIdx){
+    if(locked[qi]) return;
     answers[qi] = optIdx;
     renderQuestion();
     renderQuestionGrid();
   }
 
+  function countWrongLocked(){
+    var n = 0;
+    examSet.forEach(function(entry, idx){ if(locked[idx] && isLockedWrong(idx)) n++; });
+    return n;
+  }
+
+  /* shown once, right when the limit is crossed, then fades on its own - a banner
+     pinned in the question flow for the rest of the exam took up too much space */
+  var failToastTimer = null;
+  function showFailToast(){
+    if(!els.failToast) return;
+    els.failToast.classList.add('show');
+    clearTimeout(failToastTimer);
+    failToastTimer = setTimeout(function(){ els.failToast.classList.remove('show'); }, 4000);
+  }
+
+  function saveAnswer(){
+    if(locked[qi] || answers[qi] === null) return;
+    locked[qi] = true;
+    var entry = examSet[qi];
+    if(isLockedWrong(qi)){
+      if(window.PDRMistakes) window.PDRMistakes.recordWrong(entry.topicId, entry.qid);
+      if(!examFailed && countWrongLocked() > CFG.MAX_WRONG_TO_PASS){
+        examFailed = true;
+        showFailToast();
+      }
+    }
+    renderQuestion();
+    renderQuestionGrid();
+  }
+
   els.btnNext.addEventListener('click', function(){
+    if(!locked[qi] && answers[qi] !== null){
+      saveAnswer();
+      return;
+    }
     if(qi === examSet.length-1){
       maybeConfirmFinish();
     } else {
       qi++;
       renderQuestion();
       renderQuestionGrid();
+      scrollToQuestion();
     }
   });
   els.btnBack.addEventListener('click', function(){
@@ -326,6 +408,7 @@
     qi--;
     renderQuestion();
     renderQuestionGrid();
+    scrollToQuestion();
   });
   els.btnQuit.addEventListener('click', function(){
     if(confirm('Завершити іспит достроково? Відповіли на ' + answeredCount() + ' із ' + examSet.length + '. Питання без відповіді зарахуються як неправильні.')){
@@ -347,10 +430,15 @@
     stopTimer();
     var correct = 0, wrong = 0;
     examSet.forEach(function(entry, idx){
-      var chosen = answers[idx];
+      var chosen = locked[idx] ? answers[idx] : null;
       var isCorrect = chosen !== null && entry.question.options[chosen].correct;
-      if(isCorrect) correct++; else wrong++;
-      if(!isCorrect && window.PDRMistakes){ window.PDRMistakes.recordWrong(entry.topicId, entry.qid); }
+      if(isCorrect){ correct++; }
+      else {
+        wrong++;
+        /* a locked wrong answer was already recorded the moment it was saved;
+           only an unsaved/skipped question still needs recording here */
+        if(!locked[idx] && window.PDRMistakes){ window.PDRMistakes.recordWrong(entry.topicId, entry.qid); }
+      }
     });
     saveRecentExam(examSet.map(function(e){ return {topic_id: topicNumId(e.topicId), question_id: e.qid}; }));
     var result = {

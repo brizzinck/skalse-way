@@ -57,8 +57,23 @@
     cursor:pointer;
     font-variant-numeric:tabular-nums;
   }
-  .qgbtn.answered{background:var(--accent-soft); border-color:var(--accent-line); color:var(--accent-ink);}
+  .qgbtn.correct{background:var(--good-soft); border-color:var(--good-line); color:var(--good);}
+  .qgbtn.wrong{background:var(--bad-soft); border-color:var(--bad-line); color:var(--bad);}
   .qgbtn.current{border-color:var(--accent); border-width:2.5px;}
+
+  .examtoast{
+    position:fixed; left:50%; bottom:22px; z-index:50;
+    max-width:min(90vw, 360px);
+    padding:12px 16px; border-radius:14px;
+    font-weight:700; font-size:14px; line-height:1.35; text-align:center;
+    background:color-mix(in srgb, var(--bad) 14%, var(--surface));
+    color:var(--bad); border:1px solid var(--bad-line);
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    opacity:0; pointer-events:none;
+    transform:translate(-50%, 10px);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .examtoast.show{opacity:1; transform:translate(-50%, 0);}
 
   .opt.selected{border-color:var(--accent); background:var(--accent-soft);}
   .opt.selected .badge{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
@@ -96,7 +111,7 @@
     <div class="card hero">
       <span class="sign">🎓 20 питань · 20 хвилин · до 2 помилок</span>
       <h1>Іспитовий тест</h1>
-      <p class="lede">Стратифікована вибірка — фіксована кількість питань з кожної категорії, як на реальному іспиті. Порядок питань перемішаний, відповіді не підказуються під час тесту — результат і розбір побачиш лише в кінці.</p>
+      <p class="lede">Стратифікована вибірка — фіксована кількість питань з кожної категорії, як на реальному іспиті. Порядок питань перемішаний. Обираєш відповідь, тиснеш «Зберегти відповідь» — і одразу бачиш, правильно чи ні, як на справжньому іспиті.</p>
       <div class="lastresult" id="last-result" hidden></div>
       <div class="startrow">
         <button class="btn btn-primary" id="btn-start">Почати іспит</button>
@@ -109,7 +124,7 @@
     </div>
   </section>
 
-  <!-- QUIZ (blind — no immediate feedback) -->
+  <!-- QUIZ (save answer -> immediate correct/wrong reveal, like the real exam) -->
   <section id="view-quiz" hidden>
     <div class="examtopbar">
       <span class="examtimer" id="exam-timer">20:00</span>
@@ -119,8 +134,8 @@
       </div>
       <span class="answeredstat">Відповіли: <span id="answered-count">0/20</span></span>
     </div>
-    <div class="qgrid" id="qgrid"></div>
-    <div class="card">
+    <div class="examtoast" id="fail-toast" role="status">❌ Ліміт помилок вичерпано — тест не складено.</div>
+    <div class="card" id="quiz-card">
       <div class="qnum" id="quiz-qnum">ПИТАННЯ 1</div>
       <p class="qtext" id="quiz-qtext"></p>
       <span class="imgnote" id="quiz-imgnote" hidden>🖼️ в оригіналі є ілюстрація — див. сайт</span>
@@ -132,6 +147,7 @@
         <button class="btn btn-primary" id="btn-next">Далі</button>
       </div>
     </div>
+    <div class="qgrid" id="qgrid"></div>
   </section>
 
   <!-- SUMMARY + REVIEW -->
