@@ -649,10 +649,11 @@ footer.foot a{color:var(--ink-soft);}
   label.shuffle{justify-content:center;}
   .opt{padding:11px 12px; gap:10px;}
   .explain{padding:11px 12px;}
-  .quizfoot .spacer{flex-basis:100%; height:0; order:1;}
-  #btn-next{order:0; flex:1 1 100%;}
-  #btn-back{order:2; flex:1 1 0;}
-  #btn-quit{order:3; flex:1 1 0;}
+  .quizfoot .spacer{flex-basis:100%; height:0; order:2;}
+  #btn-next{order:-1; flex:1 1 100%;}
+  #btn-show-explain{order:0; flex:1 1 100%;}
+  #btn-back{order:3; flex:1 1 0;}
+  #btn-quit{order:4; flex:1 1 0;}
   .summary{padding:26px 16px;}
   .summaryactions{flex-direction:column-reverse; align-items:stretch;}
   .summaryactions .btn{width:100%;}

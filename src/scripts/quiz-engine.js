@@ -90,6 +90,8 @@
     quizOptions: document.getElementById('quiz-options'),
     quizExplain: document.getElementById('quiz-explain'),
     quizExplainText: document.getElementById('quiz-explain-text'),
+    btnShowExplain: document.getElementById('btn-show-explain'),
+    quizFoot: document.getElementById('quiz-foot'),
     btnNext: document.getElementById('btn-next'),
     btnBack: document.getElementById('btn-back'),
     btnQuit: document.getElementById('btn-quit'),
@@ -163,6 +165,9 @@
   var order = [];
   var qi = 0;
   var answers = [];
+  /* whether the user has clicked "Показати пояснення" for question qi in this session;
+     not persisted, so a resumed quiz always asks again before revealing */
+  var revealed = [];
 
   function isCorrect(idx, q){
     return idx !== null && q.options[idx].correct;
@@ -182,6 +187,7 @@
     order = els.chkShuffle.checked ? shuffle(QUESTIONS) : QUESTIONS.slice();
     qi = 0;
     answers = new Array(TOTAL).fill(null);
+    revealed = new Array(TOTAL).fill(false);
     showView('quiz');
     saveProgress();
     renderQuestion();
@@ -192,10 +198,30 @@
     if(!p) return;
     order = p.order_ids.map(function(id){ return QMAP[id]; });
     answers = p.answers.slice();
+    revealed = new Array(TOTAL).fill(false);
     qi = Math.min(p.question_index, TOTAL-1);
     showView('quiz');
     renderQuestion();
   }
+
+  function updateExplainView(){
+    var q = order[qi];
+    var answered = answers[qi] !== null;
+    var shown = answered && revealed[qi];
+    els.quizExplain.classList.toggle('show', shown);
+    if(shown){
+      els.quizExplainText.textContent = q.explanation || 'Пояснення до цього питання відсутнє в базі сайту.';
+    }
+    els.btnShowExplain.hidden = !answered || revealed[qi];
+  }
+  els.btnShowExplain.addEventListener('click', function(){
+    revealed[qi] = true;
+    updateExplainView();
+    els.quizExplain.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
 
   function renderQuestion(){
     var q = order[qi];
@@ -218,8 +244,7 @@
     } else {
       els.quizImgnote.hidden = !q.has_image;
     }
-    els.quizExplain.classList.toggle('show', answered);
-    els.quizExplainText.textContent = q.explanation || 'Пояснення до цього питання відсутнє в базі сайту.';
+    updateExplainView();
     els.btnNext.disabled = !answered;
     els.btnNext.textContent = (qi === TOTAL-1) ? 'Завершити' : 'Далі';
     els.btnBack.disabled = (qi === 0);
@@ -255,10 +280,10 @@
       else { el.classList.add('dim'); }
     });
     els.quizScore.textContent = computeScore() + ' ✓';
-    els.quizExplain.classList.add('show');
+    updateExplainView();
     els.btnNext.disabled = false;
     els.btnNext.focus({preventScroll: true});
-    els.quizExplain.scrollIntoView({
+    els.quizFoot.scrollIntoView({
       block: 'start',
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
     });

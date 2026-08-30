@@ -23,6 +23,8 @@
     quizOptions: document.getElementById('quiz-options'),
     quizExplain: document.getElementById('quiz-explain'),
     quizExplainText: document.getElementById('quiz-explain-text'),
+    btnShowExplain: document.getElementById('btn-show-explain'),
+    quizFoot: document.getElementById('quiz-foot'),
     quizMasteryNote: document.getElementById('quiz-mastery-note'),
     btnNext: document.getElementById('btn-next'),
     btnBack: document.getElementById('btn-back'),
@@ -123,6 +125,8 @@
   var order = [];
   var qi = 0;
   var answers = [];
+  /* whether the user has clicked "Показати пояснення" for question qi in this session */
+  var revealed = [];
 
   function computeScore(){
     var s = 0;
@@ -173,6 +177,7 @@
       order = shuffle(built);
       qi = 0;
       answers = new Array(order.length).fill(null);
+      revealed = new Array(order.length).fill(false);
       showView('quiz');
       renderQuestion();
     }).catch(function(err){
@@ -192,6 +197,24 @@
     if(!live) return '✅ Вивчено! Питання прибрано з помилок.';
     return 'Правильно ' + live.correctStreak + '/' + window.PDRMistakes.MASTERY_STREAK + ' поспіль — ще трохи, і питання зникне з помилок.';
   }
+
+  function updateExplainView(q){
+    var answered = answers[qi] !== null;
+    var shown = answered && revealed[qi];
+    els.quizExplain.classList.toggle('show', shown);
+    if(shown){
+      els.quizExplainText.textContent = q.explanation || 'Пояснення до цього питання відсутнє в базі сайту.';
+    }
+    els.btnShowExplain.hidden = !answered || revealed[qi];
+  }
+  els.btnShowExplain.addEventListener('click', function(){
+    revealed[qi] = true;
+    updateExplainView(order[qi].question);
+    els.quizExplain.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
 
   function renderQuestion(){
     var entry = order[qi];
@@ -215,8 +238,7 @@
     } else {
       els.quizImgnote.hidden = !q.has_image;
     }
-    els.quizExplain.classList.toggle('show', answered);
-    els.quizExplainText.textContent = q.explanation || 'Пояснення до цього питання відсутнє в базі сайту.';
+    updateExplainView(q);
     els.quizMasteryNote.textContent = answered ? masteryNoteFor(entry, existingAnswer) : '';
     els.btnNext.disabled = !answered;
     els.btnNext.textContent = (qi === order.length-1) ? 'Завершити' : 'Далі';
@@ -254,11 +276,11 @@
       else { el.classList.add('dim'); }
     });
     els.quizScore.textContent = computeScore() + ' ✓';
-    els.quizExplain.classList.add('show');
+    updateExplainView(entry.question);
     els.quizMasteryNote.textContent = masteryNoteFor(entry, optIdx);
     els.btnNext.disabled = false;
     els.btnNext.focus({preventScroll: true});
-    els.quizExplain.scrollIntoView({
+    els.quizFoot.scrollIntoView({
       block: 'start',
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
     });
