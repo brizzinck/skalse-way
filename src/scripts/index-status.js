@@ -39,4 +39,17 @@
     var n = window.PDRMistakes.count();
     mistakesCount.textContent = n ? (n + ' питань чекають на повторення') : 'Немає жодної помилки — так тримати';
   }
+
+  var examPill = document.getElementById('exam-last-pill');
+  if(examPill){
+    try{
+      var raw = localStorage.getItem('pdr_exam_last_v1');
+      var r = raw ? JSON.parse(raw) : null;
+      if(r){
+        examPill.hidden = false;
+        examPill.className = 'pill ' + (r.passed ? 'pill-done' : 'pill-notstarted');
+        examPill.textContent = r.score + '/' + r.total + (r.passed ? ' · складено' : ' · не складено');
+      }
+    }catch(e){ /* ignore */ }
+  }
 })();
