@@ -17,7 +17,7 @@
     try{
       var cur = loadBest();
       if(!cur || score > cur.score){
-        localStorage.setItem(LS_KEY, JSON.stringify({score:score, total:total, date:new Date().toISOString()}));
+        localStorage.setItem(LS_KEY, JSON.stringify({score:score, total:total, timestamp:Date.now()}));
       }
     }catch(e){ /* ignore */ }
   }
@@ -26,8 +26,8 @@
       var raw = localStorage.getItem(LS_KEY_PROGRESS);
       if(!raw) return null;
       var p = JSON.parse(raw);
-      if(!p || !Array.isArray(p.orderIds) || p.orderIds.length !== TOTAL) return null;
-      if(!p.orderIds.every(function(id){ return QMAP.hasOwnProperty(id); })) return null;
+      if(!p || !Array.isArray(p.order_ids) || p.order_ids.length !== TOTAL) return null;
+      if(!p.order_ids.every(function(id){ return QMAP.hasOwnProperty(id); })) return null;
       if(!Array.isArray(p.answers) || p.answers.length !== TOTAL) return null;
       return p;
     }catch(e){ return null; }
@@ -35,10 +35,10 @@
   function saveProgress(){
     try{
       localStorage.setItem(LS_KEY_PROGRESS, JSON.stringify({
-        orderIds: order.map(function(q){ return q.id; }),
+        order_ids: order.map(function(q){ return q.id; }),
         answers: answers,
-        qi: qi,
-        date: new Date().toISOString()
+        question_index: qi,
+        timestamp: Date.now()
       }));
     }catch(e){ /* ignore */ }
   }
@@ -98,7 +98,7 @@
     var p = loadProgress();
     if(p){
       els.btnContinue.hidden = false;
-      els.continuePos.textContent = (p.qi+1) + '/' + TOTAL;
+      els.continuePos.textContent = (p.question_index+1) + '/' + TOTAL;
     } else {
       els.btnContinue.hidden = true;
     }
@@ -136,18 +136,23 @@
   });
 
   /* ---------------- quiz engine ---------------- */
+  /* answers[i] is the 0-based index of the chosen option, or null if unanswered;
+     correctness is always derived from order[i].options[answers[i]].correct, never stored redundantly */
   var order = [];
   var qi = 0;
   var answers = [];
 
+  function isCorrect(idx, q){
+    return idx !== null && q.options[idx].correct;
+  }
   function computeScore(){
     var s = 0;
-    answers.forEach(function(a){ if(a && a.correct) s++; });
+    answers.forEach(function(a, i){ if(isCorrect(a, order[i])) s++; });
     return s;
   }
   function computeMissed(){
     var m = [];
-    answers.forEach(function(a, idx){ if(a && !a.correct) m.push(order[idx]); });
+    answers.forEach(function(a, idx){ if(a !== null && !isCorrect(a, order[idx])) m.push(order[idx]); });
     return m;
   }
 
@@ -163,9 +168,9 @@
   function resumeQuiz(){
     var p = loadProgress();
     if(!p) return;
-    order = p.orderIds.map(function(id){ return QMAP[id]; });
+    order = p.order_ids.map(function(id){ return QMAP[id]; });
     answers = p.answers.slice();
-    qi = Math.min(p.qi, TOTAL-1);
+    qi = Math.min(p.question_index, TOTAL-1);
     showView('quiz');
     renderQuestion();
   }
@@ -173,6 +178,7 @@
   function renderQuestion(){
     var q = order[qi];
     var existingAnswer = answers[qi];
+    var answered = existingAnswer !== null;
     els.quizPos.textContent = (qi+1) + ' / ' + TOTAL;
     els.quizFill.style.width = (((qi)/TOTAL)*100) + '%';
     els.quizScore.textContent = computeScore() + ' ✓';
@@ -188,11 +194,11 @@
       els.quizImgnote.insertAdjacentElement('afterend', img);
       els.quizImgnote.hidden = true;
     } else {
-      els.quizImgnote.hidden = !q.hasImage;
+      els.quizImgnote.hidden = !q.has_image;
     }
-    els.quizExplain.classList.toggle('show', !!existingAnswer);
+    els.quizExplain.classList.toggle('show', answered);
     els.quizExplainText.textContent = q.explanation || 'Пояснення до цього питання відсутнє в базі сайту.';
-    els.btnNext.disabled = !existingAnswer;
+    els.btnNext.disabled = !answered;
     els.btnNext.textContent = (qi === TOTAL-1) ? 'Завершити' : 'Далі';
     els.btnBack.disabled = (qi === 0);
 
@@ -202,27 +208,28 @@
       b.className = 'opt';
       b.innerHTML = '<span class="badge">'+(optIdx+1)+'</span><span class="otext"></span><span class="mark">✓</span>';
       b.querySelector('.otext').textContent = opt.text;
-      if(existingAnswer){
+      if(answered){
         b.disabled = true;
         if(opt.correct){ b.classList.add('correct'); }
-        else if(opt.letter === existingAnswer.letter){ b.classList.add('wrong'); }
+        else if(optIdx === existingAnswer){ b.classList.add('wrong'); }
         else { b.classList.add('dim'); }
       } else {
-        b.addEventListener('click', function(){ selectOption(b, opt, q); });
+        b.addEventListener('click', function(){ selectOption(optIdx, q); });
       }
       els.quizOptions.appendChild(b);
     });
   }
 
-  function selectOption(btn, opt, q){
-    if(answers[qi]) return;
-    answers[qi] = {letter: opt.letter, correct: !!opt.correct};
+  function selectOption(optIdx, q){
+    if(answers[qi] !== null) return;
+    answers[qi] = optIdx;
+    var opt = q.options[optIdx];
     if(!opt.correct && window.PDRMistakes){ window.PDRMistakes.recordWrong(window.PDR_TOPIC_ID, q.id); }
     Array.prototype.forEach.call(els.quizOptions.children, function(el, idx){
       var o = q.options[idx];
       el.disabled = true;
       if(o.correct){ el.classList.add('correct'); }
-      else if(el===btn){ el.classList.add('wrong'); }
+      else if(idx === optIdx){ el.classList.add('wrong'); }
       else { el.classList.add('dim'); }
     });
     els.quizScore.textContent = computeScore() + ' ✓';
@@ -237,7 +244,7 @@
   }
 
   els.btnNext.addEventListener('click', function(){
-    if(!answers[qi]) return;
+    if(answers[qi] === null) return;
     if(qi === TOTAL-1){
       finishQuiz();
     } else {
@@ -365,7 +372,7 @@
         img.src = q.image;
         img.alt = 'Ілюстрація до питання ' + q.id;
         body.insertBefore(img, qtext);
-      } else if(q.hasImage){
+      } else if(q.has_image){
         var note = document.createElement('span');
         note.className = 'limgnote';
         note.textContent = '🖼️ ілюстрація на сайті';
@@ -413,7 +420,7 @@
     QUESTIONS = qs;
     TOTAL = QUESTIONS.length;
     QUESTIONS.forEach(function(q){ QMAP[q.id] = q; });
-    els.factImages.textContent = QUESTIONS.filter(function(q){ return q.hasImage; }).length;
+    els.factImages.textContent = QUESTIONS.filter(function(q){ return q.has_image; }).length;
     refreshContinueButton();
   }).catch(function(err){
     console.error('Не вдалося завантажити банк питань:', err);

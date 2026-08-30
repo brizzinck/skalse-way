@@ -4,6 +4,18 @@
   var RECENT_KEY = 'pdr_exam_recent_v1';
   var LAST_RESULT_KEY = 'pdr_exam_last_v1';
 
+  /* the 41 official topic ids, in a fixed order - recent-history entries keep a
+     1-based numeric topic_id into this list instead of repeating a string like "16_2" */
+  var TOPIC_ORDER = [
+    "01","02","03","04","05","06","07","08_1","08_2","09","10","11","12","13","14","15",
+    "16_1","16_2","17","18","19","20","21","22","23","24","25","26","27","28","29","30",
+    "31","32","33","34","35","36","37","38","39"
+  ];
+  function topicNumId(topicId){
+    var n = TOPIC_ORDER.indexOf(topicId);
+    return n === -1 ? 0 : n + 1;
+  }
+
   var els = {
     viewIntro: document.getElementById('view-intro'),
     viewQuiz: document.getElementById('view-quiz'),
@@ -80,12 +92,13 @@
     var r = loadLastResult();
     if(!r){ els.lastResult.hidden = true; return; }
     els.lastResult.hidden = false;
-    var date = new Date(r.date);
+    var date = new Date(r.timestamp);
     els.lastResult.textContent = 'Останній іспит: ' + r.score + '/' + r.total +
       ' (' + (r.passed ? 'складено' : 'не складено') + ') · ' + date.toLocaleDateString('uk-UA');
   }
 
   /* ---------------- recent-exam history (avoids near-term repeats) ---------------- */
+  /* each history entry is {topic_id: <number>, question_id: <number>} - no strings */
   function getRecentHistory(){
     try{
       var raw = localStorage.getItem(RECENT_KEY);
@@ -93,17 +106,19 @@
       return Array.isArray(arr) ? arr : [];
     }catch(e){ return []; }
   }
-  function saveRecentExam(keys){
+  function saveRecentExam(refs){
     try{
       var hist = getRecentHistory();
-      hist.push(keys);
+      hist.push(refs);
       while(hist.length > CFG.RECENT_EXAMS_TO_AVOID) hist.shift();
       localStorage.setItem(RECENT_KEY, JSON.stringify(hist));
     }catch(e){ /* ignore */ }
   }
-  function recentKeySet(){
+  function recentlyUsedSet(){
     var set = {};
-    getRecentHistory().forEach(function(keys){ keys.forEach(function(k){ set[k]=true; }); });
+    getRecentHistory().forEach(function(refs){
+      refs.forEach(function(r){ set[r.topic_id + ':' + r.question_id] = true; });
+    });
     return set;
   }
 
@@ -117,7 +132,7 @@
   }
 
   function buildExamSet(onProgress){
-    var recent = recentKeySet();
+    var recent = recentlyUsedSet();
     var plan = CFG.CATEGORIES.map(function(cat){
       var n = Math.min(cat.weight, cat.topics.length);
       var activeTopics = shuffle(cat.topics).slice(0, n);
@@ -143,11 +158,12 @@
         p.activeTopics.forEach(function(topicId, idx){
           var need = p.counts[idx];
           var pool = pools[topicId] || [];
-          var filtered = pool.filter(function(q){ return !recent[topicId+':'+q.id]; });
+          var topicNum = topicNumId(topicId);
+          var filtered = pool.filter(function(q){ return !recent[topicNum + ':' + q.id]; });
           var source = filtered.length >= need ? filtered : pool;
           var picked = shuffle(source).slice(0, Math.min(need, source.length));
           picked.forEach(function(q){
-            result.push({topicId: topicId, key: topicId+':'+q.id, question: q});
+            result.push({topicId: topicId, qid: q.id, question: q});
           });
         });
       });
@@ -156,6 +172,8 @@
   }
 
   /* ---------------- exam run state ---------------- */
+  /* answers[i] is the 0-based index of the chosen option, or null if unanswered;
+     correctness is always derived from examSet[i].question.options[answers[i]].correct */
   var examSet = [];
   var qi = 0;
   var answers = [];
@@ -213,7 +231,7 @@
 
   function answeredCount(){
     var n = 0;
-    answers.forEach(function(a){ if(a) n++; });
+    answers.forEach(function(a){ if(a !== null) n++; });
     return n;
   }
 
@@ -222,7 +240,7 @@
     examSet.forEach(function(entry, idx){
       var b = document.createElement('button');
       b.type = 'button';
-      b.className = 'qgbtn' + (answers[idx] ? ' answered' : '') + (idx===qi ? ' current' : '');
+      b.className = 'qgbtn' + (answers[idx] !== null ? ' answered' : '') + (idx===qi ? ' current' : '');
       b.textContent = String(idx+1);
       b.addEventListener('click', function(){ qi = idx; renderQuestion(); renderQuestionGrid(); });
       els.qgrid.appendChild(b);
@@ -248,7 +266,7 @@
       els.quizImgnote.insertAdjacentElement('afterend', img);
       els.quizImgnote.hidden = true;
     } else {
-      els.quizImgnote.hidden = !q.hasImage;
+      els.quizImgnote.hidden = !q.has_image;
     }
     els.btnBack.disabled = (qi === 0);
     els.btnNext.textContent = (qi === examSet.length-1) ? 'Завершити іспит' : 'Далі';
@@ -256,16 +274,16 @@
     els.quizOptions.innerHTML = '';
     q.options.forEach(function(opt, optIdx){
       var b = document.createElement('button');
-      b.className = 'opt' + (chosen && chosen.letter === opt.letter ? ' selected' : '');
+      b.className = 'opt' + (chosen === optIdx ? ' selected' : '');
       b.innerHTML = '<span class="badge">'+(optIdx+1)+'</span><span class="otext"></span><span class="mark">✓</span>';
       b.querySelector('.otext').textContent = opt.text;
-      b.addEventListener('click', function(){ selectOption(opt); });
+      b.addEventListener('click', function(){ selectOption(optIdx); });
       els.quizOptions.appendChild(b);
     });
   }
 
-  function selectOption(opt){
-    answers[qi] = {letter: opt.letter};
+  function selectOption(optIdx){
+    answers[qi] = optIdx;
     renderQuestion();
     renderQuestionGrid();
   }
@@ -306,16 +324,15 @@
     var correct = 0, wrong = 0;
     examSet.forEach(function(entry, idx){
       var chosen = answers[idx];
-      var correctOpt = entry.question.options.filter(function(o){ return o.correct; })[0];
-      var isCorrect = !!(chosen && correctOpt && chosen.letter === correctOpt.letter);
+      var isCorrect = chosen !== null && entry.question.options[chosen].correct;
       if(isCorrect) correct++; else wrong++;
-      if(!isCorrect && window.PDRMistakes){ window.PDRMistakes.recordWrong(entry.topicId, entry.question.id); }
+      if(!isCorrect && window.PDRMistakes){ window.PDRMistakes.recordWrong(entry.topicId, entry.qid); }
     });
-    saveRecentExam(examSet.map(function(e){ return e.key; }));
+    saveRecentExam(examSet.map(function(e){ return {topic_id: topicNumId(e.topicId), question_id: e.qid}; }));
     var result = {
       score: correct, total: examSet.length, wrong: wrong,
       passed: wrong <= CFG.MAX_WRONG_TO_PASS,
-      date: new Date().toISOString(), timedOut: timedOut
+      timestamp: Date.now(), timed_out: timedOut
     };
     saveLastResult(result);
     renderSummary(result);
@@ -331,7 +348,7 @@
     els.verdictBanner.textContent = result.passed
       ? ('✅ Складено! Дозволено максимум ' + CFG.MAX_WRONG_TO_PASS + ' помилки — у тебе ' + result.wrong + '.')
       : ('❌ Не складено. Дозволено максимум ' + CFG.MAX_WRONG_TO_PASS + ' помилки — у тебе ' + result.wrong + '.');
-    els.sumTimedout.hidden = !result.timedOut;
+    els.sumTimedout.hidden = !result.timed_out;
     renderReview();
   }
 
@@ -340,8 +357,7 @@
     examSet.forEach(function(entry, idx){
       var q = entry.question;
       var chosen = answers[idx];
-      var correctOpt = q.options.filter(function(o){ return o.correct; })[0];
-      var isWrong = !(chosen && correctOpt && chosen.letter === correctOpt.letter);
+      var isWrong = !(chosen !== null && q.options[chosen].correct);
 
       var item = document.createElement('div');
       item.className = 'litem' + (isWrong ? ' litem-wrong' : '');
@@ -368,7 +384,7 @@
         img.src = q.image;
         img.alt = 'Ілюстрація до питання';
         body.insertBefore(img, qtext);
-      } else if(q.hasImage){
+      } else if(q.has_image){
         var note = document.createElement('span');
         note.className = 'limgnote';
         note.textContent = '🖼️ ілюстрація на сайті';
@@ -379,15 +395,15 @@
       opts.className = 'lopts';
       q.options.forEach(function(o, oIdx){
         var row = document.createElement('div');
-        row.className = 'lopt' + (o.correct ? ' correct' : '') + (chosen && chosen.letter===o.letter && !o.correct ? ' chosen-wrong' : '');
+        row.className = 'lopt' + (o.correct ? ' correct' : '') + (oIdx===chosen && !o.correct ? ' chosen-wrong' : '');
         row.innerHTML = '<span class="lletter">'+(oIdx+1)+')</span>';
-        var suffix = o.correct ? '  ✓' : (chosen && chosen.letter===o.letter ? '  ← твоя відповідь' : '');
+        var suffix = o.correct ? '  ✓' : (oIdx===chosen ? '  ← твоя відповідь' : '');
         row.appendChild(document.createTextNode(o.text + suffix));
         opts.appendChild(row);
       });
       body.appendChild(opts);
 
-      if(!chosen){
+      if(chosen === null){
         var skipped = document.createElement('div');
         skipped.className = 'skipped-note';
         skipped.textContent = 'Питання залишилось без відповіді.';

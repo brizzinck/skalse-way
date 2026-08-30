@@ -118,13 +118,15 @@
     window.scrollTo({top:0, behavior: (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto':'smooth')});
   }
 
+  /* answers[i] is the 0-based index of the chosen option, or null if unanswered;
+     correctness is always derived from order[i].question.options[answers[i]].correct */
   var order = [];
   var qi = 0;
   var answers = [];
 
   function computeScore(){
     var s = 0;
-    answers.forEach(function(a){ if(a && a.correct) s++; });
+    answers.forEach(function(a, i){ if(a !== null && order[i].question.options[a].correct) s++; });
     return s;
   }
 
@@ -161,7 +163,7 @@
           window.PDRMistakes.removeEntry(e.topicId, e.qid);
           return;
         }
-        built.push({topicId: e.topicId, qid: e.qid, key: e.topicId+':'+e.qid, question: q});
+        built.push({topicId: e.topicId, qid: e.qid, question: q});
       });
 
       els.btnStartBlitz.disabled = false;
@@ -181,17 +183,21 @@
   }
   els.btnStartBlitz.addEventListener('click', startBlitz);
 
-  function masteryNoteFor(a){
-    if(!a) return '';
-    if(!a.correct) return 'Лічильник правильних відповідей поспіль скинуто.';
-    if(a.removed) return '✅ Вивчено! Питання прибрано з помилок.';
-    return 'Правильно ' + a.streak + '/' + window.PDRMistakes.MASTERY_STREAK + ' поспіль — ще трохи, і питання зникне з помилок.';
+  /* the live store, not a value stashed at answer-time, is the source of truth here -
+     a question is only ever answered once per blitz session, so this stays accurate on revisit */
+  function masteryNoteFor(entry, idx){
+    if(idx === null) return '';
+    if(!entry.question.options[idx].correct) return 'Лічильник правильних відповідей поспіль скинуто.';
+    var live = window.PDRMistakes.get(entry.topicId, entry.qid);
+    if(!live) return '✅ Вивчено! Питання прибрано з помилок.';
+    return 'Правильно ' + live.correctStreak + '/' + window.PDRMistakes.MASTERY_STREAK + ' поспіль — ще трохи, і питання зникне з помилок.';
   }
 
   function renderQuestion(){
     var entry = order[qi];
     var q = entry.question;
     var existingAnswer = answers[qi];
+    var answered = existingAnswer !== null;
     els.quizPos.textContent = (qi+1) + ' / ' + order.length;
     els.quizFill.style.width = (((qi)/order.length)*100) + '%';
     els.quizScore.textContent = computeScore() + ' ✓';
@@ -207,12 +213,12 @@
       els.quizImgnote.insertAdjacentElement('afterend', img);
       els.quizImgnote.hidden = true;
     } else {
-      els.quizImgnote.hidden = !q.hasImage;
+      els.quizImgnote.hidden = !q.has_image;
     }
-    els.quizExplain.classList.toggle('show', !!existingAnswer);
+    els.quizExplain.classList.toggle('show', answered);
     els.quizExplainText.textContent = q.explanation || 'Пояснення до цього питання відсутнє в базі сайту.';
-    els.quizMasteryNote.textContent = masteryNoteFor(existingAnswer);
-    els.btnNext.disabled = !existingAnswer;
+    els.quizMasteryNote.textContent = answered ? masteryNoteFor(entry, existingAnswer) : '';
+    els.btnNext.disabled = !answered;
     els.btnNext.textContent = (qi === order.length-1) ? 'Завершити' : 'Далі';
     els.btnBack.disabled = (qi === 0);
 
@@ -222,39 +228,34 @@
       b.className = 'opt';
       b.innerHTML = '<span class="badge">'+(optIdx+1)+'</span><span class="otext"></span><span class="mark">✓</span>';
       b.querySelector('.otext').textContent = opt.text;
-      if(existingAnswer){
+      if(answered){
         b.disabled = true;
         if(opt.correct){ b.classList.add('correct'); }
-        else if(opt.letter === existingAnswer.letter){ b.classList.add('wrong'); }
+        else if(optIdx === existingAnswer){ b.classList.add('wrong'); }
         else { b.classList.add('dim'); }
       } else {
-        b.addEventListener('click', function(){ selectOption(b, opt, q, entry); });
+        b.addEventListener('click', function(){ selectOption(optIdx, entry); });
       }
       els.quizOptions.appendChild(b);
     });
   }
 
-  function selectOption(btn, opt, q, entry){
-    if(answers[qi]) return;
-    var removed = false, streak = 0;
-    if(opt.correct){
-      var res = window.PDRMistakes.recordCorrect(entry.topicId, entry.qid);
-      removed = res.removed;
-      streak = res.streak;
-    } else {
-      window.PDRMistakes.recordWrong(entry.topicId, q.id);
-    }
-    answers[qi] = {letter: opt.letter, correct: !!opt.correct, removed: removed, streak: streak};
+  function selectOption(optIdx, entry){
+    if(answers[qi] !== null) return;
+    answers[qi] = optIdx;
+    var opt = entry.question.options[optIdx];
+    if(opt.correct){ window.PDRMistakes.recordCorrect(entry.topicId, entry.qid); }
+    else { window.PDRMistakes.recordWrong(entry.topicId, entry.qid); }
     Array.prototype.forEach.call(els.quizOptions.children, function(el, idx){
-      var o = q.options[idx];
+      var o = entry.question.options[idx];
       el.disabled = true;
       if(o.correct){ el.classList.add('correct'); }
-      else if(el===btn){ el.classList.add('wrong'); }
+      else if(idx === optIdx){ el.classList.add('wrong'); }
       else { el.classList.add('dim'); }
     });
     els.quizScore.textContent = computeScore() + ' ✓';
     els.quizExplain.classList.add('show');
-    els.quizMasteryNote.textContent = masteryNoteFor(answers[qi]);
+    els.quizMasteryNote.textContent = masteryNoteFor(entry, optIdx);
     els.btnNext.disabled = false;
     els.btnNext.focus({preventScroll: true});
     els.quizExplain.scrollIntoView({
@@ -264,7 +265,7 @@
   }
 
   els.btnNext.addEventListener('click', function(){
-    if(!answers[qi]) return;
+    if(answers[qi] === null) return;
     if(qi === order.length-1){
       finishBlitz();
     } else {
@@ -289,7 +290,10 @@
   function finishBlitz(){
     var score = computeScore();
     var mastered = 0;
-    answers.forEach(function(a){ if(a && a.removed) mastered++; });
+    answers.forEach(function(a, i){
+      var entry = order[i];
+      if(a !== null && entry.question.options[a].correct && !window.PDRMistakes.get(entry.topicId, entry.qid)) mastered++;
+    });
     els.quizFill.style.width = '100%';
     els.sumScore.textContent = score;
     els.sumTotal.textContent = order.length;
